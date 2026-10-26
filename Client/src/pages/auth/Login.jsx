@@ -1,12 +1,67 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, ArrowLeft, ArrowRight, Lock, Mail, Sparkles, CheckCircle2, Shield } from 'lucide-react';
+import { Building2, ArrowLeft, ArrowRight, Lock, Mail, CheckCircle2, Briefcase, ShieldCheck, User } from 'lucide-react';
 
-export default function Login({ roleTitle = 'HR & Organization Admin', role = 'ADMIN', defaultEmail = 'admin@hrduo.com' }) {
+const ROLE_CONFIGS = {
+  ADMIN: {
+    icon: Building2,
+    iconBg: 'bg-[#FFC933]',
+    iconColor: 'text-slate-950',
+    accent: '#008C75',
+    label: 'HR & Organization Admin',
+    redirectPath: '/admin/dashboard',
+  },
+  MANAGER: {
+    icon: Briefcase,
+    iconBg: 'bg-violet-600',
+    iconColor: 'text-white',
+    accent: '#7C3AED',
+    label: 'Manager Portal',
+    redirectPath: '/manager/dashboard',
+  },
+  EMPLOYEE: {
+    icon: User,
+    iconBg: 'bg-emerald-500',
+    iconColor: 'text-white',
+    accent: '#059669',
+    label: 'Employee Portal',
+    redirectPath: '/employee/dashboard',
+  },
+  HR: {
+    icon: Building2,
+    iconBg: 'bg-rose-600',
+    iconColor: 'text-white',
+    accent: '#E11D48',
+    label: 'HR Portal',
+    redirectPath: '/hr/dashboard',
+  },
+  SUPER_ADMIN: {
+    icon: ShieldCheck,
+    iconBg: 'bg-indigo-600',
+    iconColor: 'text-white',
+    accent: '#4F46E5',
+    label: 'Super Admin Console',
+    redirectPath: '/superadmin/dashboard',
+  },
+};
+
+const ROLE_NAMES = {
+  ADMIN: 'Company Administrator',
+  HR: 'HR Operations Lead',
+  MANAGER: 'Alex Thompson',
+  EMPLOYEE: 'Sarah Jenkins',
+  SUPER_ADMIN: 'Super Admin',
+};
+
+export default function Login({ roleTitle, role = 'ADMIN', defaultEmail = 'admin@hrduo.com' }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
+
+  const config = ROLE_CONFIGS[role] || ROLE_CONFIGS.ADMIN;
+  const Icon = config.icon;
+  const displayTitle = roleTitle || config.label;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,9 +69,9 @@ export default function Login({ roleTitle = 'HR & Organization Admin', role = 'A
     setTimeout(() => {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('role', role);
-      localStorage.setItem('name', role === 'ADMIN' ? 'HR Administrator' : role === 'EMPLOYEE' ? 'Sarah Jenkins' : 'Super Admin');
+      localStorage.setItem('name', ROLE_NAMES[role] || 'User');
       setLoading(false);
-      navigate('/');
+      navigate(config.redirectPath);
     }, 600);
   };
 
@@ -43,11 +98,11 @@ export default function Login({ roleTitle = 'HR & Organization Admin', role = 'A
       <main className="relative z-10 max-w-md mx-auto w-full px-6 py-8">
         <div className="bg-white rounded-3xl border-2 border-[#F1E8D9] p-8 shadow-xl">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#FFC933] flex items-center justify-center text-slate-950 shadow-md mb-4">
-              <Building2 className="w-7 h-7 stroke-[2.2]" />
+            <div className={`w-14 h-14 mx-auto rounded-2xl ${config.iconBg} flex items-center justify-center shadow-md mb-4`}>
+              <Icon className={`w-7 h-7 stroke-[2.2] ${config.iconColor}`} />
             </div>
-            <h1 className="text-2xl font-black text-slate-950 mb-1">{roleTitle}</h1>
-            <p className="text-xs text-slate-500 font-medium">Enter your credentials to manage your organization</p>
+            <h1 className="text-2xl font-black text-slate-950 mb-1">{displayTitle}</h1>
+            <p className="text-xs text-slate-500 font-medium">Enter your credentials to access your portal</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -63,7 +118,7 @@ export default function Login({ roleTitle = 'HR & Organization Admin', role = 'A
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#008C75] focus:border-transparent transition-all"
-                  placeholder="admin@company.com"
+                  placeholder="you@company.com"
                 />
               </div>
             </div>
@@ -119,6 +174,10 @@ export default function Login({ roleTitle = 'HR & Organization Admin', role = 'A
 
       {/* Footer */}
       <footer className="relative z-10 max-w-7xl mx-auto w-full px-6 py-6 text-center text-xs text-slate-500">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+          <span>End-to-end encrypted · SOC 2 Compliant</span>
+        </div>
         © {new Date().getFullYear()} HRDuo Inc. All rights reserved.
       </footer>
     </div>

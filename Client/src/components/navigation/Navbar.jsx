@@ -242,15 +242,23 @@ const Navbar = ({ onMenuClick }) => {
         )}
       </AnimatePresence>
 
-      <header className="h-20 bg-white/40 backdrop-blur-md border-b border-white/20 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40">
+      <header className="h-16 lg:h-20 bg-white/75 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-3.5 sm:px-6 lg:px-8 sticky top-0 z-40">
 
-      <div className="flex items-center gap-4">
-        <button 
-          onClick={onMenuClick}
-          className="hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <Menu size={24} />
-        </button>
+      <div className="flex items-center gap-3">
+        <div className="lg:hidden flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-white p-1 shadow-sm flex items-center justify-center border border-slate-200/80">
+            <img
+              src="/hrduo_logo.png"
+              alt="HRDuo"
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentNode.innerHTML = '<span class="text-blue-600 font-black text-xs">HR</span>';
+              }}
+            />
+          </div>
+          <span className="font-black text-sm tracking-tight text-slate-900">HRDuo</span>
+        </div>
       </div>      <div className="flex items-center gap-3 lg:gap-6">
         <div className="relative" ref={notificationRef}>
           <button 

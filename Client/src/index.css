@@ -5,8 +5,10 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
     @apply font-poppins bg-[#FDFBF7] text-slate-800 antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
 

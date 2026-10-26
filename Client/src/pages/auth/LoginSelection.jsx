@@ -9,56 +9,15 @@ import {
   Sparkles,
   Lock,
   ScanFace,
-  CheckCircle2
+  CheckCircle2,
+  Briefcase,
+  Users2
 } from 'lucide-react';
 
 export default function LoginSelection() {
   const navigate = useNavigate();
 
   const portals = [
-    {
-      id: 'employee',
-      title: 'Employee Portal',
-      subtitle: 'Self-Service & Attendance',
-      description: 'Clock in with facial recognition, track attendance streaks, request time off, and download itemized monthly payslips.',
-      icon: User,
-      badge: 'Staff & Team',
-      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-      actionText: 'Enter Employee Portal',
-      bgGradient: 'from-emerald-50/70 to-teal-50/40',
-      borderColor: 'border-emerald-200/80',
-      hoverBorder: 'hover:border-emerald-400',
-      iconBg: 'bg-emerald-500 text-white',
-      demoCred: 'emp@hrduo.com',
-      onClick: () => {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('role', 'EMPLOYEE');
-        localStorage.setItem('name', 'Sarah Jenkins');
-        navigate('/');
-      },
-    },
-    {
-      id: 'admin',
-      title: 'HR & Org Admin',
-      subtitle: 'Workforce & Payroll Control',
-      description: 'Centralized admin hub for real-time biometric logs, department rostering, automated one-click payroll, and compliance.',
-      icon: Building2,
-      badge: 'HR & Management',
-      badgeColor: 'bg-amber-100 text-amber-900 border-amber-200',
-      actionText: 'Enter Admin Dashboard',
-      bgGradient: 'from-amber-50/70 to-orange-50/40',
-      borderColor: 'border-amber-200/80',
-      hoverBorder: 'hover:border-[#FFC933]',
-      iconBg: 'bg-[#FFC933] text-slate-950',
-      demoCred: 'admin@hrduo.com',
-      popular: true,
-      onClick: () => {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('role', 'ADMIN');
-        localStorage.setItem('name', 'HR Administrator');
-        navigate('/');
-      },
-    },
     {
       id: 'superadmin',
       title: 'Super Admin',
@@ -68,19 +27,88 @@ export default function LoginSelection() {
       badge: 'Platform Root',
       badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
       actionText: 'Super Admin Console',
-      bgGradient: 'from-indigo-50/70 to-blue-50/40',
       borderColor: 'border-indigo-200/80',
       hoverBorder: 'hover:border-indigo-400',
       iconBg: 'bg-indigo-600 text-white',
       demoCred: 'root@hrduo.internal',
-      onClick: () => {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('role', 'SUPER_ADMIN');
-        localStorage.setItem('name', 'Super Admin');
-        navigate('/');
-      },
+      route: '/superadmin/login',
+      role: 'SUPER_ADMIN',
+      name: 'Super Admin',
+    },
+    {
+      id: 'admin',
+      title: 'Company Admin',
+      subtitle: 'Workforce & Org Control',
+      description: 'Centralized admin hub for real-time biometric logs, department rostering, automated one-click payroll, and compliance.',
+      icon: Building2,
+      badge: 'Org Management',
+      badgeColor: 'bg-amber-100 text-amber-900 border-amber-200',
+      actionText: 'Enter Admin Dashboard',
+      borderColor: 'border-amber-200/80',
+      hoverBorder: 'hover:border-[#FFC933]',
+      iconBg: 'bg-[#FFC933] text-slate-950',
+      demoCred: 'admin@hrduo.com',
+      route: '/admin/login',
+      role: 'ADMIN',
+      name: 'Company Administrator',
+    },
+    {
+      id: 'hr',
+      title: 'HR Portal',
+      subtitle: 'Talent, Payroll & People',
+      description: 'Comprehensive HR suite for employee onboarding, recruitment pipelines, leave compliance, and payroll dispatch.',
+      icon: Users2,
+      badge: 'Human Resources',
+      badgeColor: 'bg-rose-100 text-rose-800 border-rose-200',
+      actionText: 'Enter HR Portal',
+      borderColor: 'border-rose-200/80',
+      hoverBorder: 'hover:border-rose-400',
+      iconBg: 'bg-rose-600 text-white',
+      demoCred: 'hr@hrduo.com',
+      popular: true,
+      route: '/hr/login',
+      role: 'HR',
+      name: 'HR Operations Lead',
+    },
+    {
+      id: 'manager',
+      title: 'Manager Portal',
+      subtitle: 'Team & Department Lead',
+      description: "Oversee your team's attendance, approve leave requests, assign tasks, and track department performance metrics.",
+      icon: Briefcase,
+      badge: 'Team Lead',
+      badgeColor: 'bg-violet-100 text-violet-800 border-violet-200',
+      actionText: 'Enter Manager Portal',
+      borderColor: 'border-violet-200/80',
+      hoverBorder: 'hover:border-violet-400',
+      iconBg: 'bg-violet-600 text-white',
+      demoCred: 'manager@hrduo.com',
+      route: '/manager/login',
+      role: 'MANAGER',
+      name: 'Alex Thompson',
+    },
+    {
+      id: 'employee',
+      title: 'Employee Portal',
+      subtitle: 'Self-Service & Attendance',
+      description: 'Clock in with facial recognition, track attendance streaks, request time off, and download itemized monthly payslips.',
+      icon: User,
+      badge: 'Staff & Team',
+      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      actionText: 'Enter Employee Portal',
+      borderColor: 'border-emerald-200/80',
+      hoverBorder: 'hover:border-emerald-400',
+      iconBg: 'bg-emerald-500 text-white',
+      demoCred: 'emp@hrduo.com',
+      route: '/employee/login',
+      role: 'EMPLOYEE',
+      name: 'Sarah Jenkins',
     },
   ];
+
+  const handlePortalClick = (portal) => {
+    navigate(portal.route);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-slate-900 flex flex-col justify-between selection:bg-[#FFC933] selection:text-slate-950 relative overflow-hidden">
@@ -107,7 +135,7 @@ export default function LoginSelection() {
       </header>
 
       {/* Main Selection Area */}
-      <main className="relative z-10 max-w-6xl mx-auto w-full px-6 py-8 md:py-12">
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-6 py-8 md:py-12">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFC933]/20 border border-[#FFC933]/40 text-slate-900 text-xs font-black uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-[#008C75]" />
@@ -123,17 +151,18 @@ export default function LoginSelection() {
           </p>
         </div>
 
-        {/* Portals Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        {/* Portals Grid — 5 columns on extra-large screens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
           {portals.map((portal) => {
             const Icon = portal.icon;
             return (
               <div
                 key={portal.id}
-                className={`relative flex flex-col justify-between rounded-3xl bg-white border-2 ${portal.borderColor} ${portal.hoverBorder} p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1.5 group`}
+                className={`relative flex flex-col justify-between rounded-3xl bg-white border-2 ${portal.borderColor} ${portal.hoverBorder} p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1.5 group cursor-pointer`}
+                onClick={() => handlePortalClick(portal)}
               >
                 {portal.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#FFD027] text-slate-950 border-2 border-slate-950 text-[11px] font-black uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-sm">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#FFD027] text-slate-950 border-2 border-slate-950 text-[11px] font-black uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-sm whitespace-nowrap">
                     Most Popular
                   </div>
                 )}
@@ -168,14 +197,14 @@ export default function LoginSelection() {
                       <Lock className="w-3.5 h-3.5 text-slate-400" />
                       Demo Login:
                     </span>
-                    <span className="font-mono font-bold text-slate-800">
+                    <span className="font-mono font-bold text-slate-800 text-[11px]">
                       {portal.demoCred}
                     </span>
                   </div>
 
                   {/* Enter Button */}
                   <button
-                    onClick={portal.onClick}
+                    onClick={(e) => { e.stopPropagation(); handlePortalClick(portal); }}
                     className="w-full bg-slate-950 hover:bg-[#008C75] text-white py-3.5 px-5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-colors duration-200 group-hover:shadow-lg cursor-pointer"
                   >
                     <span>{portal.actionText}</span>
