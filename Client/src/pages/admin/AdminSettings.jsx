@@ -1,86 +1,148 @@
 import React, { useState } from 'react';
-import { Settings, Bell, Shield, User, Building2, Save, Mail, Globe } from 'lucide-react';
+import { Settings, Bell, Shield, User, Building2, Save, Mail, Globe, CheckCircle2 } from 'lucide-react';
+import { useAlert } from '../../context/AlertContext';
 
 const Toggle = ({ enabled, onChange }) => (
-  <button onClick={() => onChange(!enabled)} className={`w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-[#008C75]' : 'bg-slate-200'} relative`}>
-    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${enabled ? 'left-6' : 'left-1'}`} />
+  <button
+    type="button"
+    onClick={() => onChange(!enabled)}
+    className={`w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-blue-600' : 'bg-slate-200'} relative cursor-pointer`}
+  >
+    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all ${enabled ? 'left-6' : 'left-1'}`} />
   </button>
 );
 
 export default function AdminSettings() {
-  const [notifs, setNotifs] = useState({ leaveAlert: true, attendanceAlert: true, payrollAlert: false });
-  const [orgName, setOrgName] = useState('HRDuo Demo Corp');
-  const [timezone, setTimezone] = useState('Asia/Kolkata');
+  const { showToast } = useAlert();
+
+  const [orgName, setOrgName] = useState('Acme Technologies Inc.');
+  const [adminName, setAdminName] = useState('Elena Rostova');
+  const [adminEmail, setAdminEmail] = useState('admin@hrduo.com');
+  const [timezone, setTimezone] = useState('PST (UTC-8)');
   const [workStart, setWorkStart] = useState('09:00');
   const [workEnd, setWorkEnd] = useState('18:00');
+  const [notifs, setNotifs] = useState({ leaveAlert: true, attendanceAlert: true, payrollAlert: true });
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    showToast('Company administrative preferences saved successfully!', 'success');
+  };
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-black text-slate-900">Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">Configure your organization's HR preferences and policies.</p>
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Company HR Settings</h1>
+        <p className="text-sm text-slate-500 mt-1">Configure company working policies, office hours, and administrative profile.</p>
       </div>
 
-      {/* Organization Info */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h2 className="font-black text-slate-900 mb-5 flex items-center gap-2">
-          <Building2 size={16} className="text-amber-500" />
-          Organization Info
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Organization Name</label>
-            <input value={orgName} onChange={e => setOrgName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#008C75] focus:border-transparent" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Work Start</label>
-              <input type="time" value={workStart} onChange={e => setWorkStart(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#008C75] focus:border-transparent" />
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* Administrator Profile Card */}
+        <div className="bg-white rounded-3xl shadow-2xs border border-slate-200/80 p-6">
+          <div className="flex items-center gap-4 pb-6 border-b border-slate-100 mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600 text-white font-black text-xl flex items-center justify-center shadow-md">
+              ER
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Work End</label>
-              <input type="time" value={workEnd} onChange={e => setWorkEnd(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#008C75] focus:border-transparent" />
+              <h2 className="text-lg font-bold text-slate-900">{adminName}</h2>
+              <div className="text-xs text-blue-600 font-bold uppercase tracking-wider">VP Operations & Company Admin</div>
+              <div className="text-xs text-slate-400 mt-0.5">Primary Org Administrator</div>
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Timezone</label>
-            <select value={timezone} onChange={e => setTimezone(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#008C75]">
-              <option value="Asia/Kolkata">IST — Asia/Kolkata (UTC+5:30)</option>
-              <option value="America/New_York">EST — America/New_York (UTC-5)</option>
-              <option value="Europe/London">GMT — Europe/London (UTC+0)</option>
-              <option value="Asia/Singapore">SGT — Asia/Singapore (UTC+8)</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
-      {/* Notifications */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h2 className="font-black text-slate-900 mb-4 flex items-center gap-2">
-          <Bell size={16} className="text-blue-600" />
-          Notification Preferences
-        </h2>
-        <div className="space-y-4">
-          {[
-            { key: 'leaveAlert', label: 'Leave Request Alerts', desc: 'Notify when an employee submits a leave request' },
-            { key: 'attendanceAlert', label: 'Absence Alerts', desc: 'Alert when an employee is absent without notice' },
-            { key: 'payrollAlert', label: 'Payroll Reminders', desc: 'Remind before payroll processing deadline' },
-          ].map(item => (
-            <div key={item.key} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Company Registered Name</label>
+              <input
+                type="text"
+                value={orgName}
+                onChange={e => setOrgName(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Administrator Email</label>
+              <input
+                type="email"
+                value={adminEmail}
+                onChange={e => setAdminEmail(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Default Operating Timezone</label>
+              <input
+                type="text"
+                value={timezone}
+                onChange={e => setTimezone(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <div className="font-semibold text-slate-800 text-sm">{item.label}</div>
-                <div className="text-xs text-slate-400">{item.desc}</div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Work Start</label>
+                <input
+                  type="time"
+                  value={workStart}
+                  onChange={e => setWorkStart(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                />
               </div>
-              <Toggle enabled={notifs[item.key]} onChange={(v) => setNotifs(p => ({ ...p, [item.key]: v }))} />
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Work End</label>
+                <input
+                  type="time"
+                  value={workEnd}
+                  onChange={e => setWorkEnd(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                />
+              </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
 
-      <button className="inline-flex items-center gap-2 bg-[#008C75] hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold text-sm shadow transition-colors">
-        <Save size={16} />
-        Save Settings
-      </button>
+        {/* Notifications Card */}
+        <div className="bg-white rounded-3xl shadow-2xs border border-slate-200/80 p-6">
+          <h2 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
+            <Bell size={18} className="text-blue-600" />
+            Alert Subscriptions
+          </h2>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-slate-50">
+              <div>
+                <div className="font-bold text-slate-800 text-xs">Workforce Leave Requests Alert</div>
+                <div className="text-[11px] text-slate-400">Receive notifications when employees submit time-off requests</div>
+              </div>
+              <Toggle enabled={notifs.leaveAlert} onChange={v => setNotifs({ ...notifs, leaveAlert: v })} />
+            </div>
+
+            <div className="flex items-center justify-between py-2 border-b border-slate-50">
+              <div>
+                <div className="font-bold text-slate-800 text-xs">Biometric Kiosk Anomaly Alarms</div>
+                <div className="text-[11px] text-slate-400">Alert on late check-ins and device connectivity changes</div>
+              </div>
+              <Toggle enabled={notifs.attendanceAlert} onChange={v => setNotifs({ ...notifs, attendanceAlert: v })} />
+            </div>
+
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <div className="font-bold text-slate-800 text-xs">Monthly Payroll Generation Reminders</div>
+                <div className="text-[11px] text-slate-400">Monthly reminder 3 days prior to pay-day cutoff</div>
+              </div>
+              <Toggle enabled={notifs.payrollAlert} onChange={v => setNotifs({ ...notifs, payrollAlert: v })} />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+          >
+            <Save size={15} />
+            <span>Save Company Settings</span>
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

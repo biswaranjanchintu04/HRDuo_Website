@@ -15,7 +15,7 @@ const SuperAdminLayout = () => {
   };
 
   return (
-    <div className="h-screen bg-[#F4F7FE] flex overflow-hidden font-poppins relative">
+    <div className="min-h-screen bg-[#F4F7FE] flex overflow-hidden font-poppins relative">
       {/* Decorative background accents */}
       <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[20%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
@@ -28,7 +28,7 @@ const SuperAdminLayout = () => {
         }`}
       >
         <Navbar onMenuClick={toggleSidebar} />
-        <div className="flex-1 overflow-y-auto p-4 pb-20 lg:p-8 lg:pb-8 scroll-smooth" onClick={closeSidebarOnMobile}>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-16 scroll-smooth" onClick={closeSidebarOnMobile}>
           <Outlet />
         </div>
       </main>

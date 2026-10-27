@@ -1,123 +1,178 @@
 import React, { useState } from 'react';
-import { CalendarRange, CheckCircle2, XCircle, Clock, Filter } from 'lucide-react';
-
-const allLeaves = [
-  { name: 'Raj Mehta', dept: 'Engineering', type: 'Casual', from: 'Nov 4', to: 'Nov 6', days: 3, applied: 'Oct 24', status: 'Pending' },
-  { name: 'Anita Roy', dept: 'Finance', type: 'Sick', from: 'Nov 1', to: 'Nov 2', days: 2, applied: 'Oct 30', status: 'Pending' },
-  { name: 'David Kim', dept: 'Marketing', type: 'Annual', from: 'Nov 10', to: 'Nov 14', days: 5, applied: 'Oct 22', status: 'Pending' },
-  { name: 'Sarah Jenkins', dept: 'Engineering', type: 'Casual', from: 'Oct 15', to: 'Oct 16', days: 2, applied: 'Oct 12', status: 'Approved' },
-  { name: 'Marcus Lee', dept: 'Sales', type: 'Sick', from: 'Oct 10', to: 'Oct 11', days: 2, applied: 'Oct 10', status: 'Approved' },
-  { name: 'Linda Cho', dept: 'Engineering', type: 'Annual', from: 'Sep 28', to: 'Oct 2', days: 5, applied: 'Sep 20', status: 'Approved' },
-  { name: 'James Obi', dept: 'Operations', type: 'Casual', from: 'Sep 15', to: 'Sep 15', days: 1, applied: 'Sep 14', status: 'Declined' },
-];
-
-const statusConfig = {
-  Pending: { color: 'bg-amber-100 text-amber-700', icon: Clock },
-  Approved: { color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
-  Declined: { color: 'bg-red-100 text-red-700', icon: XCircle },
-};
-
-const leaveTypeColor = {
-  Casual: 'bg-blue-100 text-blue-700',
-  Sick: 'bg-rose-100 text-rose-700',
-  Annual: 'bg-violet-100 text-violet-700',
-};
+import { 
+  CalendarRange, CheckCircle2, XCircle, Clock, Filter, 
+  Search, Check, X, User, AlertCircle, FileText 
+} from 'lucide-react';
+import { useHRMS } from '../../context/HRMSContext';
+import { useAlert } from '../../context/AlertContext';
 
 export default function AdminLeavesPage() {
+  const { leaves, updateLeaveStatus } = useHRMS();
+  const { showToast, showConfirm } = useAlert();
+
   const [filter, setFilter] = useState('All');
-  const [leaves, setLeaves] = useState(allLeaves);
+  const [search, setSearch] = useState('');
 
-  const shown = filter === 'All' ? leaves : leaves.filter(l => l.status === filter);
+  const filtered = leaves.filter(l => {
+    const matchesFilter = filter === 'All' || l.status === filter;
+    const matchesSearch = l.name.toLowerCase().includes(search.toLowerCase()) ||
+      l.type.toLowerCase().includes(search.toLowerCase()) ||
+      l.department.toLowerCase().includes(search.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
 
-  const updateStatus = (idx, newStatus) => {
-    const updated = [...leaves];
-    updated[idx] = { ...updated[idx], status: newStatus };
-    setLeaves(updated);
+  const pendingCount = leaves.filter(l => l.status === 'Pending').length;
+  const approvedCount = leaves.filter(l => l.status === 'Approved').length;
+  const rejectedCount = leaves.filter(l => l.status === 'Rejected').length;
+
+  const handleApprove = async (leave) => {
+    const confirmed = await showConfirm(`Approve ${leave.days} day(s) ${leave.type} for ${leave.name}?`);
+    if (confirmed) {
+      updateLeaveStatus(leave.id, 'Approved');
+      showToast(`Leave application #${leave.id} approved!`, 'success');
+    }
+  };
+
+  const handleReject = async (leave) => {
+    const confirmed = await showConfirm(`Decline leave request for ${leave.name}?`);
+    if (confirmed) {
+      updateLeaveStatus(leave.id, 'Rejected');
+      showToast(`Leave application #${leave.id} rejected.`, 'info');
+    }
   };
 
   return (
     <div className="space-y-6">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Leave Requests</h1>
-          <p className="text-sm text-slate-500 mt-1">Review and manage employee leave requests.</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Workforce Leave Approvals & Policy</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Review time-off applications, statutory leave quotas, and supervisor authorizations.
+          </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {['All', 'Pending', 'Approved', 'Declined'].map(f => (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {['All', 'Pending', 'Approved', 'Rejected'].map(st => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors ${filter === f ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+              key={st}
+              onClick={() => setFilter(st)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                filter === st
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
             >
-              {f}
+              {st}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: 'Pending', count: leaves.filter(l => l.status === 'Pending').length, color: 'bg-amber-100 text-amber-700' },
-          { label: 'Approved', count: leaves.filter(l => l.status === 'Approved').length, color: 'bg-emerald-100 text-emerald-700' },
-          { label: 'Declined', count: leaves.filter(l => l.status === 'Declined').length, color: 'bg-red-100 text-red-700' },
-        ].map(s => (
-          <div key={s.label} className={`rounded-2xl p-4 text-center ${s.color}`}>
-            <div className="text-2xl font-black">{s.count}</div>
-            <div className="text-xs font-bold mt-1">{s.label}</div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center justify-between">
+          <div>
+            <div className="text-2xl font-black text-amber-600">{pendingCount}</div>
+            <div className="text-xs font-bold text-slate-600 mt-0.5">Pending Approvals</div>
           </div>
-        ))}
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <Clock size={20} />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center justify-between">
+          <div>
+            <div className="text-2xl font-black text-emerald-600">{approvedCount}</div>
+            <div className="text-xs font-bold text-slate-600 mt-0.5">Approved Time-Off</div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <CheckCircle2 size={20} />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center justify-between">
+          <div>
+            <div className="text-2xl font-black text-rose-600">{rejectedCount}</div>
+            <div className="text-xs font-bold text-slate-600 mt-0.5">Rejected Applications</div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <XCircle size={20} />
+          </div>
+        </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                <th className="text-left px-5 py-3.5">Employee</th>
-                <th className="text-left px-5 py-3.5">Type</th>
-                <th className="text-left px-5 py-3.5">Duration</th>
-                <th className="text-left px-5 py-3.5">Days</th>
-                <th className="text-left px-5 py-3.5">Applied On</th>
-                <th className="text-left px-5 py-3.5">Status</th>
-                <th className="text-left px-5 py-3.5">Actions</th>
+                <th className="px-5 py-3.5">Employee</th>
+                <th className="px-5 py-3.5">Leave Type</th>
+                <th className="px-5 py-3.5">Duration Window</th>
+                <th className="px-5 py-3.5">Days</th>
+                <th className="px-5 py-3.5">Reason / Justification</th>
+                <th className="px-5 py-3.5">Status</th>
+                <th className="px-5 py-3.5 text-right">Approval Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {shown.map((l, i) => {
-                const cfg = statusConfig[l.status];
-                const Icon = cfg.icon;
-                const realIdx = leaves.indexOf(l);
-                return (
-                  <tr key={i} className="border-t border-slate-50 hover:bg-slate-50/60 transition-colors">
-                    <td className="px-5 py-4">
-                      <div className="font-bold text-slate-900">{l.name}</div>
-                      <div className="text-xs text-slate-400">{l.dept}</div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${leaveTypeColor[l.type]}`}>{l.type}</span>
-                    </td>
-                    <td className="px-5 py-4 text-slate-600 text-xs">{l.from} – {l.to}</td>
-                    <td className="px-5 py-4 font-bold text-slate-900">{l.days}d</td>
-                    <td className="px-5 py-4 text-slate-400 text-xs">{l.applied}</td>
-                    <td className="px-5 py-4">
-                      <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${cfg.color}`}>
-                        <Icon size={12} />
-                        {l.status}
+            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+              {filtered.map((leave) => (
+                <tr key={leave.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <img src={leave.avatar} alt={leave.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                      <div>
+                        <div className="font-bold text-slate-900">{leave.name}</div>
+                        <div className="text-[11px] text-slate-400">{leave.department}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5 font-semibold text-slate-800 text-xs">
+                    <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 font-bold">
+                      {leave.type}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-slate-600">
+                    {leave.fromDate} – {leave.toDate}
+                  </td>
+                  <td className="px-5 py-3.5 font-bold text-slate-900">{leave.days} Day(s)</td>
+                  <td className="px-5 py-3.5 text-xs text-slate-500 max-w-xs truncate" title={leave.reason}>
+                    {leave.reason}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                      leave.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                      leave.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                      'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}>
+                      {leave.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    {leave.status === 'Pending' ? (
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleApprove(leave)}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(leave)}
+                          className="px-2.5 py-1 rounded-lg border border-rose-200 hover:bg-rose-50 text-rose-600 font-bold text-xs transition-colors cursor-pointer"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-400 font-medium italic">
+                        Resolved by {leave.approver}
                       </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      {l.status === 'Pending' && (
-                        <div className="flex items-center gap-1.5">
-                          <button onClick={() => updateStatus(realIdx, 'Approved')} className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition-colors">Approve</button>
-                          <button onClick={() => updateStatus(realIdx, 'Declined')} className="text-xs font-bold bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors">Decline</button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

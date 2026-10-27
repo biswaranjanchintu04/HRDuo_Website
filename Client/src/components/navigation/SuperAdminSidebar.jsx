@@ -1,100 +1,149 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  CreditCard, 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  LayoutDashboard,
+  Building2,
+  CreditCard,
+  Receipt,
+  LineChart,
+  LifeBuoy,
+  Bell,
+  FileText,
   Settings,
-  Menu,
-  ChevronLeft,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 
-const SuperAdminSidebar = ({ isOpen, toggleSidebar }) => {
+export default function SuperAdminSidebar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate('/superadmin/login');
+    localStorage.removeItem('isAuthenticated');
+    navigate('/login');
   };
 
-  const menuItems = [
+  const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/superadmin/dashboard' },
-    { name: 'Organizations', icon: Building2, path: '/superadmin/organizations' },
-    { name: 'Payments', icon: CreditCard, path: '/superadmin/payments' },
-    { name: 'Settings', icon: Settings, path: '/superadmin/settings' },
+    { name: 'Company Management', icon: Building2, path: '/superadmin/companies' },
+    { name: 'Subscription Plans', icon: CreditCard, path: '/superadmin/plans' },
+    { name: 'Billing & Payments', icon: Receipt, path: '/superadmin/payments' },
+    { name: 'Platform Analytics', icon: LineChart, path: '/superadmin/analytics' },
+    { name: 'Support Tickets', icon: LifeBuoy, path: '/superadmin/tickets' },
+    { name: 'Notifications', icon: Bell, path: '/superadmin/notifications' },
+    { name: 'Audit Logs', icon: FileText, path: '/superadmin/audit-logs' },
+    { name: 'Profile & Settings', icon: Settings, path: '/superadmin/settings' },
   ];
 
   return (
     <>
-      {/* Backdrop for mobile - hidden as we are using bottom nav now */}
-      <div 
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 lg:hidden ${
+      {/* Mobile Backdrop */}
+      <div
+        className={`fixed inset-0 bg-slate-950/60 z-40 transition-opacity duration-300 lg:hidden ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        } hidden`}
+        }`}
         onClick={toggleSidebar}
       />
 
-      <aside 
-        className={`fixed z-50 bg-white border-t border-gray-100 lg:border-t-0 lg:border-r transition-all duration-300 bottom-0 left-0 right-0 h-16 w-full flex flex-row items-center justify-between rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] lg:top-0 lg:bottom-auto lg:right-auto lg:h-screen lg:flex-col lg:justify-start lg:rounded-none lg:shadow-none lg:w-20 ${
-          isOpen ? 'lg:w-64' : 'lg:w-20'
-        }`}
+      <aside
+        className={`fixed top-0 left-0 bottom-0 z-50 bg-[#0061E0] text-white transition-all duration-300 flex flex-col justify-between shadow-2xl overflow-x-hidden overflow-y-auto no-scrollbar ${
+          isOpen ? 'w-64' : 'w-20'
+        } ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
-        <div className="hidden lg:flex items-center justify-between p-6 mb-8 w-full">
-          {isOpen && (
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="text-[#3B82F6]" size={24} />
-              <h1 className="text-xl font-semibold tracking-tight text-[#1E293B]">Super Admin</h1>
-            </div>
-          )}
+        {/* Header / Brand */}
+        <div className={`h-20 flex items-center ${isOpen ? 'px-6' : 'px-4 justify-center'} transition-all justify-between border-b border-white/10`}>
           <button 
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-400"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity focus:outline-none group text-left"
           >
-            {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
+            <div className="w-10 h-10 bg-white p-1.5 rounded-xl flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-105 shrink-0">
+              <ShieldCheck className="w-6 h-6 text-[#0061E0]" />
+            </div>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col min-w-0"
+              >
+                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-white/70 -mb-0.5">
+                  HRDuo Cloud
+                </span>
+                <h1 className="text-lg font-bold tracking-tight whitespace-nowrap text-white">
+                  Super Admin
+                </h1>
+              </motion.div>
+            )}
           </button>
+
+          {isOpen && (
+            <button
+              onClick={toggleSidebar}
+              className="hidden lg:flex w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white items-center justify-center transition-colors focus:outline-none"
+              title="Collapse Sidebar"
+            >
+              <ChevronLeft size={16} />
+            </button>
+          )}
         </div>
 
-        <nav className="flex flex-row lg:flex-col items-center justify-around lg:justify-start gap-1 lg:gap-2 overflow-x-auto lg:overflow-visible w-full lg:w-auto h-full lg:h-auto px-4 py-2 lg:px-3 no-scrollbar">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={({ isActive }) => 
-                isActive 
-                  ? 'flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-3 py-1 lg:px-4 lg:py-3 text-white bg-[#3B82F6] font-semibold rounded-xl lg:shadow-lg lg:shadow-blue-600/20 shrink-0 transition-all' 
-                  : 'flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-3 py-1 lg:px-4 lg:py-3 text-gray-500 hover:text-[#3B82F6] hover:bg-blue-50 transition-all cursor-pointer rounded-xl shrink-0'
-              }
-            >
-              <item.icon size={20} className="min-w-[20px] lg:size-[22px] lg:min-w-[22px]" />
-              <span className="text-[9px] font-semibold tracking-tight lg:hidden">{item.name}</span>
-              {isOpen && <span className="whitespace-nowrap font-semibold text-sm hidden lg:block">{item.name}</span>}
-            </NavLink>
-          ))}
-          
-          {/* Logout button at the end of bottom nav bar on mobile */}
-          <button 
-            onClick={handleLogout}
-            className="flex flex-col lg:hidden items-center gap-1 px-3 py-1 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer rounded-xl shrink-0"
-          >
-            <LogOut size={20} className="min-w-[20px]" />
-            <span className="text-[9px] font-semibold tracking-tight">Logout</span>
-          </button>
+        {/* Navigation Items */}
+        <nav className="flex-1 py-4 pr-2 space-y-1 overflow-x-hidden overflow-y-auto no-scrollbar">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  isOpen
+                    ? isActive
+                      ? 'flex flex-row items-center gap-3.5 px-6 py-3 text-white bg-white/20 font-bold rounded-r-full w-[calc(100%-0.5rem)] transition-all shadow-sm backdrop-blur-md text-sm'
+                      : 'flex flex-row items-center gap-3.5 px-6 py-3 text-white/80 hover:text-white hover:bg-white/10 font-semibold rounded-r-full w-[calc(100%-0.5rem)] transition-all cursor-pointer group text-sm'
+                    : isActive
+                      ? 'flex items-center justify-center py-3 px-2 mx-2 text-white bg-white/20 rounded-xl shadow-sm backdrop-blur-md'
+                      : 'flex items-center justify-center py-3 px-2 mx-2 text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all'
+                }
+                title={!isOpen ? item.name : undefined}
+              >
+                <Icon size={20} className="shrink-0 group-hover:scale-105 transition-transform" />
+                {isOpen && <span className="truncate whitespace-nowrap">{item.name}</span>}
+              </NavLink>
+            );
+          })}
         </nav>
 
-        <div className="mt-auto mb-6 hidden lg:block px-3 w-full">
-          <button 
+        {/* Footer info & Logout */}
+        <div className="p-3 border-t border-white/10 space-y-2 pr-2">
+          {isOpen && (
+            <div className="p-2.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between text-white">
+              <div>
+                <div className="text-[11px] font-bold">Platform v2.4</div>
+                <div className="text-[10px] text-white/80 font-semibold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  All Systems Normal
+                </div>
+              </div>
+              <NavLink to="/login" className="text-white/70 hover:text-white" title="Switch Role">
+                <ExternalLink size={14} />
+              </NavLink>
+            </div>
+          )}
+
+          <button
             onClick={handleLogout}
-            className="flex items-center gap-4 px-4 py-3 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer rounded-xl w-full text-left"
+            className={`flex items-center gap-3.5 px-6 py-3 text-white/80 hover:text-white hover:bg-white/15 transition-all cursor-pointer rounded-r-full w-[calc(100%-0.5rem)] text-left font-semibold text-sm group ${
+              !isOpen ? 'justify-center px-0 mx-2 !w-[calc(100%-1rem)] rounded-xl' : ''
+            }`}
+            title={!isOpen ? 'Sign Out' : undefined}
           >
-            <LogOut size={22} className="min-w-[22px]" />
-            {isOpen && <span className="whitespace-nowrap font-semibold text-sm">Logout</span>}
+            <LogOut size={20} className="shrink-0 group-hover:scale-110 transition-transform" />
+            {isOpen && <span className="font-bold">Sign Out</span>}
           </button>
         </div>
       </aside>
     </>
   );
-};
-
-export default SuperAdminSidebar;
+}

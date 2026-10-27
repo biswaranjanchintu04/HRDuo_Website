@@ -2,171 +2,340 @@ import React from 'react';
 import {
   Building2, Users, CreditCard, TrendingUp, AlertTriangle,
   CheckCircle2, Clock, MoreHorizontal, ArrowUpRight, Globe,
-  ShieldCheck, Activity, DollarSign, Zap
+  ShieldCheck, Activity, DollarSign, Zap, Plus, ArrowRight
 } from 'lucide-react';
+import {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+} from 'recharts';
+import { Link } from 'react-router-dom';
+import { useHRMS } from '../../context/HRMSContext';
 
-const stats = [
-  { label: 'Total Organizations', value: '1,284', change: '+12', changeType: 'up', icon: Building2, color: 'bg-blue-500', light: 'bg-blue-50 text-blue-700' },
-  { label: 'Active Subscriptions', value: '1,091', change: '+8', changeType: 'up', icon: CreditCard, color: 'bg-emerald-500', light: 'bg-emerald-50 text-emerald-700' },
-  { label: 'Total Employees', value: '48,239', change: '+1.2k', changeType: 'up', icon: Users, color: 'bg-violet-500', light: 'bg-violet-50 text-violet-700' },
-  { label: 'MRR', value: '$94,210', change: '+6.4%', changeType: 'up', icon: DollarSign, color: 'bg-amber-500', light: 'bg-amber-50 text-amber-700' },
+const companyGrowthData = [
+  { month: 'Jan', companies: 85, employees: 7200 },
+  { month: 'Feb', companies: 92, employees: 7900 },
+  { month: 'Mar', companies: 98, employees: 8500 },
+  { month: 'Apr', companies: 106, employees: 9200 },
+  { month: 'May', companies: 114, employees: 9950 },
+  { month: 'Jun', companies: 122, employees: 10800 },
+  { month: 'Jul', companies: 128, employees: 11400 },
+  { month: 'Aug', companies: 133, employees: 11950 },
+  { month: 'Sep', companies: 138, employees: 12350 },
+  { month: 'Oct', companies: 142, employees: 12840 }
 ];
 
-const recentOrgs = [
-  { name: 'TechVision Labs', plan: 'Enterprise', employees: 248, status: 'Active', joined: 'Oct 24, 2026' },
-  { name: 'Greenfield Corp', plan: 'Professional', employees: 92, status: 'Active', joined: 'Oct 22, 2026' },
-  { name: 'Nexus Solutions', plan: 'Starter', employees: 14, status: 'Trial', joined: 'Oct 20, 2026' },
-  { name: 'Apex Analytics', plan: 'Enterprise', employees: 510, status: 'Active', joined: 'Oct 18, 2026' },
-  { name: 'CloudBase Inc', plan: 'Professional', employees: 67, status: 'Suspended', joined: 'Oct 15, 2026' },
+const revenueData = [
+  { month: 'Mar', revenue: 98000, newMrr: 12000 },
+  { month: 'Apr', revenue: 108000, newMrr: 10000 },
+  { month: 'May', revenue: 116000, newMrr: 8000 },
+  { month: 'Jun', revenue: 125000, newMrr: 9000 },
+  { month: 'Jul', revenue: 132000, newMrr: 7000 },
+  { month: 'Aug', revenue: 139000, newMrr: 7000 },
+  { month: 'Sep', revenue: 144000, newMrr: 5000 },
+  { month: 'Oct', revenue: 148500, newMrr: 4500 }
 ];
 
-const systemAlerts = [
-  { type: 'warning', msg: 'CloudBase Inc subscription payment failed (retry in 2 days)', time: '2h ago' },
-  { type: 'info', msg: 'New enterprise org "TechVision Labs" onboarded successfully', time: '6h ago' },
-  { type: 'success', msg: 'System backup completed — all 1,284 tenant snapshots saved', time: '12h ago' },
-  { type: 'warning', msg: '3 organizations approaching storage quota (>90%)', time: '1d ago' },
+const subscriptionDistData = [
+  { name: 'Enterprise', value: 20, color: '#2563EB', mrr: '$9,980' },
+  { name: 'Professional', value: 64, color: '#7C3AED', mrr: '$12,736' },
+  { name: 'Starter', value: 58, color: '#059669', mrr: '$2,842' },
+  { name: 'Custom Tier', value: 4, color: '#D97706', mrr: '$5,196' },
 ];
-
-const planDist = [
-  { plan: 'Enterprise', count: 312, pct: 24, color: 'bg-blue-500' },
-  { plan: 'Professional', count: 589, pct: 46, color: 'bg-violet-500' },
-  { plan: 'Starter', count: 383, pct: 30, color: 'bg-slate-300' },
-];
-
-const statusColor = {
-  Active: 'bg-emerald-100 text-emerald-700',
-  Trial: 'bg-amber-100 text-amber-700',
-  Suspended: 'bg-red-100 text-red-700',
-};
 
 export default function SuperAdminDashboard() {
+  const { companies, payments } = useHRMS();
+
+  const totalCompaniesCount = 142;
+  const activeCompaniesCount = 136;
+  const totalEmployeesCount = '12,840';
+  const activeSubsCount = 136;
+  const monthlyRevenue = '$148,500';
+  const pendingPayments = '$4,200';
+
+  const dashboardCards = [
+    {
+      title: 'Total Companies',
+      value: totalCompaniesCount,
+      change: '+14% YoY',
+      trend: 'up',
+      icon: Building2,
+      color: 'bg-blue-600',
+      lightColor: 'bg-blue-50 text-blue-700'
+    },
+    {
+      title: 'Active Companies',
+      value: activeCompaniesCount,
+      change: '95.7% Active',
+      trend: 'up',
+      icon: Globe,
+      color: 'bg-emerald-600',
+      lightColor: 'bg-emerald-50 text-emerald-700'
+    },
+    {
+      title: 'Total Employees',
+      value: totalEmployeesCount,
+      change: '+490 this mo',
+      trend: 'up',
+      icon: Users,
+      color: 'bg-purple-600',
+      lightColor: 'bg-purple-50 text-purple-700'
+    },
+    {
+      title: 'Active Subscriptions',
+      value: activeSubsCount,
+      change: '4 Trialings',
+      trend: 'up',
+      icon: CreditCard,
+      color: 'bg-amber-600',
+      lightColor: 'bg-amber-50 text-amber-700'
+    },
+    {
+      title: 'Monthly Recurring Revenue',
+      value: monthlyRevenue,
+      change: '+7.4% MoM',
+      trend: 'up',
+      icon: DollarSign,
+      color: 'bg-indigo-600',
+      lightColor: 'bg-indigo-50 text-indigo-700'
+    },
+    {
+      title: 'Pending Payments',
+      value: pendingPayments,
+      change: '3 Invoices Due',
+      trend: 'down',
+      icon: AlertTriangle,
+      color: 'bg-rose-600',
+      lightColor: 'bg-rose-50 text-rose-700'
+    }
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Platform Overview</h1>
-          <p className="text-sm text-slate-500 mt-1">Monitor all tenants, revenue, and system health in real time.</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Super Admin Platform Overview</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Global governance, multi-tenant subscription health, and recurring platform revenue.
+          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full border border-emerald-200">
-            <Activity size={13} />
-            All Systems Operational
+
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            99.98% System Uptime
           </div>
+
+          <Link
+            to="/superadmin/companies"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md shadow-blue-500/20 transition-all"
+          >
+            <Plus size={14} />
+            <span>Provision Company</span>
+          </Link>
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {stats.map((s) => {
-          const Icon = s.icon;
+      {/* 6 Required Dashboard Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {dashboardCards.map((card) => {
+          const Icon = card.icon;
           return (
-            <div key={s.label} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 ${s.color} rounded-xl flex items-center justify-center`}>
-                  <Icon size={18} className="text-white" />
+            <div
+              key={card.title}
+              className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className={`w-9 h-9 rounded-xl ${card.color} text-white flex items-center justify-center shadow-xs`}>
+                  <Icon size={18} />
                 </div>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.light}`}>
-                  {s.change} this month
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${card.lightColor}`}>
+                  {card.change}
                 </span>
               </div>
-              <div className="text-2xl font-black text-slate-900">{s.value}</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">{s.label}</div>
+              <div>
+                <div className="text-xl font-black text-slate-900 tracking-tight leading-none">
+                  {card.value}
+                </div>
+                <div className="text-xs text-slate-500 font-semibold mt-1 truncate">
+                  {card.title}
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Middle Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Organizations */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100">
-          <div className="flex items-center justify-between p-5 border-b border-slate-100">
-            <h2 className="font-black text-slate-900">Recent Organizations</h2>
-            <button className="text-xs text-blue-600 font-bold hover:underline">View all →</button>
+      {/* Required Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Chart 1: Company & Tenant Growth */}
+        <div className="lg:col-span-8 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-base font-bold text-slate-900">Company & Workforce Growth</h2>
+              <p className="text-xs text-slate-500">Net new tenant organizations onboarded in 2026</p>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                +67% Growth YTD
+              </span>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="text-left px-5 py-3">Organization</th>
-                  <th className="text-left px-5 py-3">Plan</th>
-                  <th className="text-left px-5 py-3">Employees</th>
-                  <th className="text-left px-5 py-3">Status</th>
-                  <th className="text-left px-5 py-3">Joined</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrgs.map((org, i) => (
-                  <tr key={i} className="border-t border-slate-50 hover:bg-slate-50/60 transition-colors">
-                    <td className="px-5 py-3.5 font-semibold text-slate-900">{org.name}</td>
-                    <td className="px-5 py-3.5 text-slate-600">{org.plan}</td>
-                    <td className="px-5 py-3.5 text-slate-600">{org.employees}</td>
-                    <td className="px-5 py-3.5">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${statusColor[org.status]}`}>
-                        {org.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-slate-500 text-xs">{org.joined}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          <div className="h-64 sm:h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={companyGrowthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="compGrowth" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2563EB" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="#94A3B8" fontSize={11} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
+                  itemStyle={{ color: '#93C5FD' }}
+                />
+                <Area type="monotone" dataKey="companies" name="Total Companies" stroke="#2563EB" strokeWidth={2.5} fillOpacity={1} fill="url(#compGrowth)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Plan Distribution */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-          <h2 className="font-black text-slate-900 mb-5">Subscription Plans</h2>
-          <div className="space-y-4">
-            {planDist.map((p) => (
-              <div key={p.plan}>
-                <div className="flex items-center justify-between mb-1.5 text-sm">
-                  <span className="font-semibold text-slate-700">{p.plan}</span>
-                  <span className="font-bold text-slate-900">{p.count} orgs</span>
-                </div>
-                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${p.color} rounded-full transition-all`} style={{ width: `${p.pct}%` }} />
-                </div>
-                <div className="text-xs text-slate-400 mt-1">{p.pct}% of total</div>
-              </div>
-            ))}
+        {/* Chart 2: Subscription Distribution */}
+        <div className="lg:col-span-4 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">Subscription Distribution</h2>
+            <p className="text-xs text-slate-500">Tier distribution across 142 clients</p>
           </div>
 
-          <div className="mt-6 pt-5 border-t border-slate-100 space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500 font-medium">Avg. org size</span>
-              <span className="font-bold text-slate-900">37.6 employees</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500 font-medium">Churn rate (30d)</span>
-              <span className="font-bold text-emerald-600">1.2%</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500 font-medium">Uptime (30d)</span>
-              <span className="font-bold text-emerald-600">99.97%</span>
-            </div>
+          <div className="h-52 w-full my-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={subscriptionDistData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={80}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {subscriptionDistData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+            {subscriptionDistData.map((tier) => (
+              <div key={tier.name} className="flex items-center gap-2 text-xs">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: tier.color }} />
+                <div className="truncate">
+                  <span className="font-bold text-slate-800">{tier.name}: </span>
+                  <span className="text-slate-500 font-medium">{tier.value}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* System Alerts */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-        <h2 className="font-black text-slate-900 mb-4">System Alerts</h2>
-        <div className="space-y-3">
-          {systemAlerts.map((a, i) => (
-            <div key={i} className={`flex items-start gap-3 p-3.5 rounded-xl border ${
-              a.type === 'warning' ? 'bg-amber-50 border-amber-100' :
-              a.type === 'success' ? 'bg-emerald-50 border-emerald-100' :
-              'bg-blue-50 border-blue-100'
-            }`}>
-              {a.type === 'warning' ? <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" /> :
-               a.type === 'success' ? <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 shrink-0" /> :
-               <Zap size={16} className="text-blue-500 mt-0.5 shrink-0" />}
-              <div className="flex-1 text-sm font-medium text-slate-700">{a.msg}</div>
-              <span className="text-xs text-slate-400 shrink-0">{a.time}</span>
+      {/* Chart 3: Monthly Revenue & Recent Organizations */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Monthly Revenue Bar Chart */}
+        <div className="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-bold text-slate-900">Monthly Revenue Stream (MRR)</h2>
+              <p className="text-xs text-slate-500">Platform SaaS monthly revenue in USD</p>
             </div>
-          ))}
+            <Link to="/superadmin/payments" className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+              <span>View Ledger</span>
+              <ArrowRight size={13} />
+            </Link>
+          </div>
+
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={revenueData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="#94A3B8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val / 1000}k`} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
+                  formatter={(value) => [`$${value.toLocaleString()}`, 'Total MRR']}
+                />
+                <Bar dataKey="revenue" fill="#3B82F6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Live Organization Table */}
+        <div className="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Managed Companies</h2>
+                <p className="text-xs text-slate-500">Live tenant roster & subscription health</p>
+              </div>
+              <Link to="/superadmin/companies" className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                <span>All Companies</span>
+                <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+                    <th className="pb-3">Company</th>
+                    <th className="pb-3">Plan</th>
+                    <th className="pb-3">MRR</th>
+                    <th className="pb-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {companies.slice(0, 5).map((comp) => (
+                    <tr key={comp.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="py-3 font-bold text-slate-900">
+                        <div>{comp.name}</div>
+                        <div className="text-[11px] text-slate-400 font-normal">{comp.industry}</div>
+                      </td>
+                      <td className="py-3">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
+                          {comp.plan}
+                        </span>
+                      </td>
+                      <td className="py-3 font-semibold text-slate-900">{comp.mrr}</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          comp.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                          comp.status === 'Trial' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                          'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}>
+                          {comp.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>Showing top 5 of {companies.length} sample enterprises</span>
+            <span className="font-semibold text-blue-600">Sync status: Real-time</span>
+          </div>
         </div>
       </div>
     </div>
