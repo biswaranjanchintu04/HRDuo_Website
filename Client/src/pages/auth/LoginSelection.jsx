@@ -116,8 +116,9 @@ export default function LoginSelection() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#FFC933]/20 via-[#008C75]/10 to-transparent blur-3xl pointer-events-none" />
 
       {/* Navigation Header */}
-      <header className="relative z-10 max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
+      <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-xs">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 group">
           <img
             src="/hrduo_logo.png"
             alt="HRDuo Logo"
@@ -132,6 +133,7 @@ export default function LoginSelection() {
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
         </Link>
+        </div>
       </header>
 
       {/* Main Selection Area */}

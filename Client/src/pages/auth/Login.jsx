@@ -126,32 +126,34 @@ export default function Login({ role: initialRole = 'ADMIN', roleTitle }) {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[450px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#FFC933]/20 via-[#0061E0]/10 to-transparent blur-3xl pointer-events-none" />
 
       {/* Top Navbar */}
-      <header className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-white p-1.5 shadow-md border border-[#F1E8D9] flex items-center justify-center">
-            <img 
-              src="/favicon.png" 
-              alt="HRDuo" 
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span class="text-[#0061E0] font-black text-xs">HR</span>';
-              }}
-            />
-          </div>
-          <div>
-            <div className="font-extrabold text-slate-900 text-lg leading-tight">HRDuo</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#0061E0]">Enterprise Cloud</div>
-          </div>
-        </Link>
+      <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-white p-1.5 shadow-md border border-[#F1E8D9] flex items-center justify-center">
+              <img 
+                src="/favicon.png" 
+                alt="HRDuo" 
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.parentNode.innerHTML = '<span class="text-[#0061E0] font-black text-xs">HR</span>';
+                }}
+              />
+            </div>
+            <div>
+              <div className="font-extrabold text-slate-900 text-lg leading-tight">HRDuo</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#0061E0]">Enterprise Cloud</div>
+            </div>
+          </Link>
 
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-slate-950 bg-white px-3.5 py-2 rounded-full border border-[#F1E8D9] shadow-sm hover:shadow transition-all"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Landing Page</span>
-        </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-slate-950 bg-white px-3.5 py-2 rounded-full border border-[#F1E8D9] shadow-sm hover:shadow transition-all"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Landing Page</span>
+          </Link>
+        </div>
       </header>
 
       {/* Main Container */}

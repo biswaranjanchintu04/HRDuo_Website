@@ -191,7 +191,7 @@ export default function Navbar({ onMenuClick }) {
   };
 
   return (
-    <header className="h-16 lg:h-20 bg-white/75 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-3.5 sm:px-6 lg:px-8 sticky top-0 z-40 transition-all font-poppins">
+    <header className="h-16 lg:h-20 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] flex items-center justify-between px-3.5 sm:px-6 lg:px-8 sticky top-0 z-40 shrink-0 transition-all font-poppins">
       {/* Left: Mobile hamburger + Mobile logo + Breadcrumbs */}
       <div className="flex items-center gap-3">
         <button
