@@ -631,6 +631,22 @@ const DEFAULT_LEAVES = [
     approver: 'Marcus Sterling'
   },
   {
+    id: 'LR-007',
+    empId: 'EMP001',
+    name: 'Sophia Chen',
+    role: 'Senior Full Stack Engineer',
+    department: 'Engineering',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+    type: 'Casual Leave',
+    fromDate: '2026-10-19',
+    toDate: '2026-10-19',
+    days: 1,
+    reason: 'Personal urgent appointment.',
+    status: 'Approved',
+    appliedOn: '2026-10-10',
+    approver: 'Marcus Sterling'
+  },
+  {
     id: 'LR-005',
     empId: 'EMP010',
     name: 'Noah Campbell',
@@ -737,6 +753,8 @@ const DEFAULT_CORRECTIONS = [
 ];
 
 const DEFAULT_HOLIDAYS = [
+  { date: '2026-10-12', day: 'Monday', name: 'Indigenous Peoples / Columbus Day', type: 'Public Holiday', status: 'Passed' },
+  { date: '2026-10-30', day: 'Friday', name: 'Autumn Company Holiday', type: 'Company Holiday', status: 'Upcoming' },
   { date: '2026-11-26', day: 'Thursday', name: 'Thanksgiving Day', type: 'Public Holiday', status: 'Upcoming' },
   { date: '2026-11-27', day: 'Friday', name: 'Day After Thanksgiving', type: 'Company Holiday', status: 'Upcoming' },
   { date: '2026-12-24', day: 'Thursday', name: 'Christmas Eve (Half Day)', type: 'Company Holiday', status: 'Upcoming' },

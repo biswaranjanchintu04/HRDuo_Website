@@ -23,7 +23,7 @@ export default function SuperAdminSidebar({ isOpen, toggleSidebar }) {
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
-    navigate('/login');
+    navigate('/superadmin/login');
   };
 
   const navItems = [
@@ -126,7 +126,7 @@ export default function SuperAdminSidebar({ isOpen, toggleSidebar }) {
                   All Systems Normal
                 </div>
               </div>
-              <NavLink to="/login" className="text-white/70 hover:text-white" title="Switch Role">
+              <NavLink to="/superadmin/login" className="text-white/70 hover:text-white" title="Switch Role">
                 <ExternalLink size={14} />
               </NavLink>
             </div>

@@ -114,7 +114,7 @@ function App() {
               </Route>
 
               {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<Navigate to="/login/selection" replace />} />
               <Route path="/login/selection" element={<LoginSelection />} />
               <Route path="/admin/login" element={<Login role="ADMIN" roleTitle="Company Admin Console" />} />
               <Route path="/hr/login" element={<Login role="HR" roleTitle="HR Management Portal" />} />

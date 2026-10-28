@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Menu, 
+  Menu,
   Search, 
   Bell, 
-  ChevronDown, 
   User, 
   Settings, 
   LogOut, 
@@ -11,13 +10,8 @@ import {
   Building2, 
   Users2, 
   Briefcase, 
-  UserCheck, 
-  Check, 
-  ExternalLink,
-  Sparkles,
-  X,
-  Clock,
-  AlertCircle
+  UserCheck,
+  X
 } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -83,7 +77,6 @@ export default function Navbar({ onMenuClick }) {
   const { notices, tickets, leaves } = useHRMS();
   const { showToast } = useAlert();
 
-  const [showPortalMenu, setShowPortalMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -97,16 +90,12 @@ export default function Navbar({ onMenuClick }) {
     }
   });
 
-  const portalMenuRef = useRef(null);
   const notifMenuRef = useRef(null);
   const profileMenuRef = useRef(null);
 
   // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (portalMenuRef.current && !portalMenuRef.current.contains(e.target)) {
-        setShowPortalMenu(false);
-      }
       if (notifMenuRef.current && !notifMenuRef.current.contains(e.target)) {
         setShowNotifications(false);
       }
@@ -178,40 +167,38 @@ export default function Navbar({ onMenuClick }) {
     showToast('All notifications marked as read', 'success');
   };
 
-  const handlePortalSwitch = (portal) => {
-    setShowPortalMenu(false);
-    navigate(portal.path);
-    showToast(`Switched to ${portal.name} view`, 'info');
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
-    navigate('/login');
+    const logoutPath = activePortal.id === 'superadmin' ? '/superadmin/login' : '/login';
+    navigate(logoutPath);
     showToast('Signed out of HRMS demonstration', 'info');
   };
 
   return (
     <header className="h-16 lg:h-20 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] flex items-center justify-between px-3.5 sm:px-6 lg:px-8 sticky top-0 z-40 shrink-0 transition-all font-poppins">
-      {/* Left: Mobile hamburger + Mobile logo + Breadcrumbs */}
-      <div className="flex items-center gap-3">
+      {/* Left: Mobile hamburger (opens More drawer) + Mobile logo + Breadcrumbs */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Mobile: hamburger opens the More/sidebar drawer */}
         <button
           onClick={onMenuClick}
-          className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer"
-          title="Toggle Navigation"
+          className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 transition-colors focus:outline-none touch-manipulation"
+          title="Open Menu"
+          aria-label="Open navigation menu"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Mobile branding */}
-        <div className="lg:hidden flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-white p-1 shadow-sm flex items-center justify-center border border-slate-200/80">
+        <div className="lg:hidden flex items-center gap-1.5">
+          <div className="w-7 h-7 rounded-lg bg-white p-1 shadow-sm flex items-center justify-center border border-slate-200/80">
             <img
               src="/favicon.png"
               alt="HRDuo"
               className="w-full h-full object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span class="text-[#0061E0] font-black text-xs">HR</span>';
+                e.target.parentNode.innerHTML = '<span class="text-[#0061E0] font-black text-[10px]">HR</span>';
               }}
             />
           </div>
@@ -239,74 +226,8 @@ export default function Navbar({ onMenuClick }) {
         </div>
       </div>
 
-      {/* Right Controls: Portal Quick Switcher, Communications Bell, User Profile */}
+      {/* Right Controls: Communications Bell, User Profile */}
       <div className="flex items-center gap-2 sm:gap-4">
-        {/* Quick Portal Switcher */}
-        <div className="relative" ref={portalMenuRef}>
-          <button
-            onClick={() => setShowPortalMenu(!showPortalMenu)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/80 hover:border-[#0061E0]/50 bg-white hover:bg-blue-50/40 shadow-xs transition-all text-xs font-bold text-slate-800 cursor-pointer"
-          >
-            <activePortal.icon className="w-4 h-4 text-[#0061E0]" />
-            <span className="hidden sm:inline font-bold">{activePortal.name}</span>
-            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${activePortal.badgeColor}`}>
-              {activePortal.badge}
-            </span>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
-          </button>
-
-          <AnimatePresence>
-            {showPortalMenu && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.96 }}
-                transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-72 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 z-50 overflow-hidden"
-              >
-                <div className="px-3.5 py-2.5 border-b border-slate-100">
-                  <div className="flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase tracking-wider">
-                    <Sparkles className="w-3.5 h-3.5 text-[#0061E0]" />
-                    <span>Role Portal Switcher</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">Explore any role with 1 click</p>
-                </div>
-
-                <div className="py-1.5 space-y-1">
-                  {PORTALS.map((portal) => {
-                    const Icon = portal.icon;
-                    const isActive = activePortal.id === portal.id;
-                    return (
-                      <button
-                        key={portal.id}
-                        onClick={() => handlePortalSwitch(portal)}
-                        className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all ${
-                          isActive
-                            ? 'bg-blue-50 text-blue-900 font-bold border border-blue-100'
-                            : 'hover:bg-slate-50 text-slate-700 font-medium'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-slate-900">{portal.name}</div>
-                            <div className="text-[11px] text-slate-500">{portal.user}</div>
-                          </div>
-                        </div>
-
-                        {isActive && <Check className="w-4 h-4 text-blue-600" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
 
         {/* Notifications / Communications Bell */}
         <div className="relative" ref={notifMenuRef}>
@@ -496,22 +417,7 @@ export default function Navbar({ onMenuClick }) {
 
               <div className="p-4 max-h-80 overflow-y-auto space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">Quick Navigation</div>
-                {PORTALS.map(portal => (
-                  <button
-                    key={portal.id}
-                    onClick={() => {
-                      setShowSearchModal(false);
-                      handlePortalSwitch(portal);
-                    }}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors text-left"
-                  >
-                    <div className="flex items-center gap-3">
-                      <portal.icon className="w-4 h-4 text-blue-600" />
-                      <span className="text-xs font-bold text-slate-800">{portal.name} Dashboard</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono">{portal.path}</span>
-                  </button>
-                ))}
+                <p className="text-xs text-slate-400 px-2 py-2">Use the sidebar to navigate between modules.</p>
               </div>
             </motion.div>
           </div>

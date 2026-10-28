@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   User,
   Building2,
-  ShieldCheck,
   ArrowRight,
   ArrowLeft,
   Sparkles,
@@ -18,23 +17,6 @@ export default function LoginSelection() {
   const navigate = useNavigate();
 
   const portals = [
-    {
-      id: 'superadmin',
-      title: 'Super Admin',
-      subtitle: 'Platform & Multi-Tenant',
-      description: 'Global infrastructure management, enterprise organization provisioning, subscription metrics, and tenant governance.',
-      icon: ShieldCheck,
-      badge: 'Platform Root',
-      badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      actionText: 'Super Admin Console',
-      borderColor: 'border-indigo-200/80',
-      hoverBorder: 'hover:border-indigo-400',
-      iconBg: 'bg-indigo-600 text-white',
-      demoCred: 'root@hrduo.internal',
-      route: '/superadmin/login',
-      role: 'SUPER_ADMIN',
-      name: 'Super Admin',
-    },
     {
       id: 'admin',
       title: 'Company Admin',
