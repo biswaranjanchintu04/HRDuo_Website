@@ -14,7 +14,7 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
 // Standard base attendance data for October 2026 for Sophia Chen (EMP001)
 const BASE_ATTENDANCE_OCTOBER = {
@@ -29,6 +29,7 @@ const BASE_ATTENDANCE_OCTOBER = {
   '2026-10-14': { in: '09:00 AM', out: '06:03 PM', hours: '9h 03m', status: 'Present', notes: 'Biometric Verified' },
   '2026-10-15': { in: '08:52 AM', out: '06:20 PM', hours: '9h 28m', status: 'Present', notes: 'Biometric Verified' },
   '2026-10-16': { in: '09:06 AM', out: '06:02 PM', hours: '8h 56m', status: 'Present', notes: 'Biometric Verified' },
+  '2026-10-19': { in: '—', out: '—', hours: '0h 00m', status: 'Absent', notes: 'Unexcused Absence' },
   '2026-10-20': { in: '09:00 AM', out: '06:02 PM', hours: '9h 02m', status: 'Present', notes: 'Biometric Verified' },
   '2026-10-21': { in: '09:35 AM', out: '06:40 PM', hours: '9h 05m', status: 'Late', notes: 'Traffic delay approved' },
   '2026-10-22': { in: '08:58 AM', out: '06:05 PM', hours: '9h 07m', status: 'Present', notes: 'Biometric Verified' },
@@ -36,6 +37,11 @@ const BASE_ATTENDANCE_OCTOBER = {
   '2026-10-26': { in: '09:04 AM', out: '06:05 PM', hours: '9h 01m', status: 'Present', notes: 'Biometric Verified' },
   '2026-10-27': { in: '09:12 AM', out: '06:00 PM', hours: '8h 48m', status: 'Present', notes: 'Biometric Verified' },
   '2026-10-28': { in: '09:04 AM', out: '—', hours: '7h 15m', status: 'Present', notes: 'Biometric Verified (Today)' },
+};
+
+const DEFAULT_OCT_HOLIDAYS = {
+  '2026-10-12': { date: '2026-10-12', name: "Indigenous Peoples' Day", type: 'Public Holiday' },
+  '2026-10-30': { date: '2026-10-30', name: 'Autumn Observance', type: 'Company Holiday' },
 };
 
 export default function EmployeeAttendance() {
@@ -78,9 +84,10 @@ export default function EmployeeAttendance() {
     setSelectedDateStr('2026-10-28');
   };
 
-  // Build calendar matrix
+  // Build calendar matrix (Monday-first)
   const { calendarDays, monthlyStats } = useMemo(() => {
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    // 0=Mon, 1=Tue, ..., 6=Sun
+    const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
 
@@ -100,7 +107,7 @@ export default function EmployeeAttendance() {
     };
 
     // 1. Previous month trailing days
-    for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
       const d = daysInPrevMonth - i;
       const prevM = month === 0 ? 11 : month - 1;
       const prevY = month === 0 ? year - 1 : year;
@@ -109,7 +116,7 @@ export default function EmployeeAttendance() {
         dateNumber: d,
         dateStr,
         isCurrentMonth: false,
-        dayOfWeek: new Date(prevY, prevM, d).getDay(),
+        dayOfWeek: (new Date(prevY, prevM, d).getDay() + 6) % 7,
       });
     }
 
@@ -117,11 +124,11 @@ export default function EmployeeAttendance() {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = formatDate(year, month, d);
       const dayDate = new Date(year, month, d);
-      const dayOfWeek = dayDate.getDay();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const dayOfWeek = (dayDate.getDay() + 6) % 7; // 0=Mon ... 5=Sat, 6=Sun
+      const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
 
       // Check Holiday
-      const holiday = holidays.find(h => h.date === dateStr);
+      const holiday = holidays.find(h => h.date === dateStr) || DEFAULT_OCT_HOLIDAYS[dateStr];
 
       // Check Leave
       const leave = myLeaves.find(l => {
@@ -162,7 +169,7 @@ export default function EmployeeAttendance() {
       } else if (isWeekend) {
         category = 'weekend';
         title = 'Weekly Off';
-        subtext = dayOfWeek === 0 ? 'Sunday' : 'Saturday';
+        subtext = dayOfWeek === 6 ? 'Sunday' : 'Saturday';
         weekendCount++;
       } else {
         workingDaysTotal++;
@@ -210,7 +217,7 @@ export default function EmployeeAttendance() {
       });
     }
 
-    // 3. Next month leading days (to fill 35 or 42 grid cells)
+    // 3. Next month leading days (fill to 35 or 42 grid cells)
     const totalSlots = days.length <= 35 ? 35 : 42;
     const remainingSlots = totalSlots - days.length;
     for (let d = 1; d <= remainingSlots; d++) {
@@ -221,7 +228,7 @@ export default function EmployeeAttendance() {
         dateNumber: d,
         dateStr,
         isCurrentMonth: false,
-        dayOfWeek: new Date(nextY, nextM, d).getDay(),
+        dayOfWeek: (new Date(nextY, nextM, d).getDay() + 6) % 7,
       });
     }
 
@@ -354,35 +361,9 @@ export default function EmployeeAttendance() {
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-          {/* View switcher tabs */}
-          <div className="flex items-center p-1 bg-slate-100 rounded-xl text-xs font-bold text-slate-600">
-            <button
-              onClick={() => setActiveView('calendar')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
-                activeView === 'calendar'
-                  ? 'bg-white text-emerald-700 shadow-xs font-black'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              Calendar View
-            </button>
-            <button
-              onClick={() => setActiveView('timesheet')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
-                activeView === 'timesheet'
-                  ? 'bg-white text-emerald-700 shadow-xs font-black'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5" />
-              Timesheet List
-            </button>
-          </div>
-
           <button
             onClick={handleExportCSV}
-            className="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-2 shadow-xs transition-all"
+            className="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-2 shadow-xs transition-all cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
             <span className="hidden sm:inline">Export</span> CSV
@@ -441,82 +422,80 @@ export default function EmployeeAttendance() {
       {activeView === 'calendar' ? (
         /* ================= CALENDAR VIEW ================= */
         <div className="space-y-4 sm:space-y-5">
-          {/* Calendar Box */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          {/* Calendar Box — Minimalist modern design */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 sm:p-7">
+
             {/* Calendar Controls & Month Switcher */}
-            <div className="p-3.5 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-0.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center bg-slate-100 rounded-xl p-1">
                   <button
                     onClick={handlePrevMonth}
-                    className="p-1.5 hover:bg-white hover:shadow-xs rounded-lg text-slate-600 hover:text-slate-900 transition-all"
+                    className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white transition-all cursor-pointer"
                     title="Previous month"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={handleNextMonth}
-                    className="p-1.5 hover:bg-white hover:shadow-xs rounded-lg text-slate-600 hover:text-slate-900 transition-all"
+                    className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white transition-all cursor-pointer"
                     title="Next month"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
 
-                <h2 className="text-base sm:text-lg font-black text-slate-900">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   {MONTH_NAMES[month]} {year}
                 </h2>
 
                 <button
                   onClick={handleToday}
-                  className="ml-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200/60 transition-colors"
+                  className="text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
                 >
                   Today
                 </button>
               </div>
 
-              {/* Status Legend */}
-              <div className="flex items-center gap-2.5 sm:gap-3 text-xs flex-wrap">
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                  <span className="text-[11px] font-medium">Present</span>
+              {/* Minimalist Legend with colored dots */}
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap text-xs text-slate-600">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Present</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                  <span className="text-[11px] font-medium">Late</span>
+                <span className="flex items-center gap-1.5 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span>Late</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-                  <span className="text-[11px] font-medium">Leave</span>
+                <span className="flex items-center gap-1.5 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  <span>Absent</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                  <span className="text-[11px] font-medium">Holiday</span>
+                <span className="flex items-center gap-1.5 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-purple-500" />
+                  <span>Holiday</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                  <span className="text-[11px] font-medium">Weekend</span>
+                <span className="flex items-center gap-1.5 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-teal-400" />
+                  <span>Leave</span>
                 </span>
               </div>
             </div>
 
-            {/* Days of Week Header */}
-            <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/80 text-center">
-              {WEEKDAYS.map((wd, i) => (
+            {/* Days of Week Header — MON, TUE, WED, THU, FRI, SAT, SUN */}
+            <div className="grid grid-cols-7 text-center pt-5 pb-3">
+              {WEEKDAYS.map((wd) => (
                 <div
                   key={wd}
-                  className={`py-2 text-[11px] font-bold tracking-wider uppercase ${
-                    i === 0 || i === 6 ? 'text-slate-400' : 'text-slate-600'
-                  }`}
+                  className="text-xs sm:text-sm font-semibold text-slate-800 tracking-wider"
                 >
-                  <span className="hidden sm:inline">{wd}</span>
-                  <span className="sm:hidden">{wd.charAt(0)}</span>
+                  {wd}
                 </div>
               ))}
             </div>
 
             {/* Calendar Days Grid */}
-            <div className="grid grid-cols-7 gap-[1px] bg-slate-200/70 p-[1px]">
+            <div className="grid grid-cols-7 gap-y-3 sm:gap-y-5 text-center pt-2 pb-2">
               {calendarDays.map((day, idx) => {
                 const isSelected = day.isCurrentMonth && day.dateStr === selectedDateStr;
 
@@ -524,42 +503,27 @@ export default function EmployeeAttendance() {
                   return (
                     <div
                       key={idx}
-                      className="bg-slate-50/50 p-1.5 sm:p-2 min-h-[58px] sm:min-h-[96px] text-slate-300 select-none"
+                      className="flex flex-col items-center justify-center min-h-[50px] sm:min-h-[62px] select-none"
                     >
-                      <span className="text-xs font-medium">{day.dateNumber}</span>
+                      <span className="text-slate-300 font-normal text-sm sm:text-base">
+                        {day.dateNumber}
+                      </span>
                     </div>
                   );
                 }
 
-                // Styling based on category
-                let tileBg = 'bg-white hover:bg-slate-50/80';
-                let dotColor = 'bg-slate-300';
-                let badgeClass = '';
-
-                if (day.category === 'holiday') {
-                  tileBg = 'bg-purple-50/40 hover:bg-purple-50/70';
-                  dotColor = 'bg-purple-500';
-                  badgeClass = 'bg-purple-100 text-purple-800 border-purple-200';
-                } else if (day.category === 'leave') {
-                  tileBg = 'bg-sky-50/40 hover:bg-sky-50/70';
-                  dotColor = 'bg-sky-500';
-                  badgeClass = 'bg-sky-100 text-sky-800 border-sky-200';
-                } else if (day.category === 'weekend') {
-                  tileBg = 'bg-slate-50/70 text-slate-400';
-                  dotColor = 'bg-slate-300';
-                  badgeClass = 'bg-slate-100 text-slate-500';
+                // Colored dots underneath date number
+                const dots = [];
+                if (day.category === 'present') {
+                  dots.push('bg-emerald-500');
                 } else if (day.category === 'late') {
-                  tileBg = 'bg-amber-50/40 hover:bg-amber-50/70';
-                  dotColor = 'bg-amber-500';
-                  badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
-                } else if (day.category === 'present') {
-                  tileBg = 'bg-emerald-50/30 hover:bg-emerald-50/60';
-                  dotColor = 'bg-emerald-500';
-                  badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                  dots.push('bg-rose-400', 'bg-amber-400');
+                } else if (day.category === 'leave') {
+                  dots.push('bg-teal-400', 'bg-teal-400');
+                } else if (day.category === 'holiday') {
+                  dots.push('bg-purple-500');
                 } else if (day.category === 'absent') {
-                  tileBg = 'bg-rose-50/40 hover:bg-rose-50/70';
-                  dotColor = 'bg-rose-500';
-                  badgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
+                  dots.push('bg-rose-500');
                 }
 
                 return (
@@ -567,105 +531,33 @@ export default function EmployeeAttendance() {
                     key={idx}
                     type="button"
                     onClick={() => setSelectedDateStr(day.dateStr)}
-                    className={`relative p-1.5 sm:p-2.5 min-h-[64px] sm:min-h-[100px] flex flex-col justify-between text-left transition-all cursor-pointer ${tileBg} ${
-                      isSelected
-                        ? 'ring-2 ring-emerald-600 ring-offset-2 z-10 shadow-sm rounded-lg bg-white'
-                        : ''
-                    }`}
+                    className="group relative flex flex-col items-center justify-center min-h-[52px] sm:min-h-[64px] py-1 cursor-pointer focus:outline-none"
                   >
-                    {/* Top Row: Date number & Today Pill */}
-                    <div className="flex items-center justify-between w-full">
-                      <span
-                        className={`text-xs sm:text-sm font-black rounded-full w-6 h-6 flex items-center justify-center transition-colors ${
-                          day.isToday
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : isSelected
-                            ? 'bg-slate-900 text-white'
-                            : 'text-slate-800'
-                        }`}
-                      >
-                        {day.dateNumber}
-                      </span>
-
-                      {/* Dot for mobile view */}
-                      <span className={`sm:hidden w-2 h-2 rounded-full ${dotColor}`}></span>
-
-                      {/* Category micro icon for desktop */}
-                      <span className="hidden sm:inline-flex">
-                        {day.category === 'holiday' && (
-                          <span className="text-[10px] text-purple-600 font-bold bg-purple-100 px-1.5 py-0.5 rounded">Holiday</span>
-                        )}
-                        {day.category === 'leave' && (
-                          <span className="text-[10px] text-sky-600 font-bold bg-sky-100 px-1.5 py-0.5 rounded">Leave</span>
-                        )}
-                        {day.category === 'late' && (
-                          <span className="text-[10px] text-amber-600 font-bold bg-amber-100 px-1.5 py-0.5 rounded">Late</span>
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Desktop Content inside tile */}
-                    <div className="hidden sm:block mt-1 space-y-1 w-full overflow-hidden">
-                      {day.category === 'holiday' && (
-                        <div className="text-[11px] font-bold text-purple-900 truncate" title={day.holiday?.name}>
-                          🎉 {day.holiday?.name}
-                        </div>
-                      )}
-
-                      {day.category === 'leave' && (
-                        <div className="text-[11px] font-bold text-sky-900 truncate" title={day.leave?.type}>
-                          🏖️ {day.leave?.type}
-                        </div>
-                      )}
-
-                      {day.category === 'present' && (
-                        <div className="space-y-0.5">
-                          <div className="text-[10px] font-mono text-emerald-800 font-semibold truncate">
-                            In {day.attendanceRecord?.in}
-                          </div>
-                          <div className="text-[10px] font-bold text-emerald-600">
-                            {day.attendanceRecord?.hours}
-                          </div>
-                        </div>
-                      )}
-
-                      {day.category === 'late' && (
-                        <div className="space-y-0.5">
-                          <div className="text-[10px] font-mono text-amber-800 font-bold truncate">
-                            In {day.attendanceRecord?.in}
-                          </div>
-                          <div className="text-[10px] font-semibold text-amber-700">
-                            {day.attendanceRecord?.hours}
-                          </div>
-                        </div>
-                      )}
-
-                      {day.category === 'weekend' && (
-                        <div className="text-[10px] text-slate-400 font-medium">
-                          Weekly Off
-                        </div>
-                      )}
-
-                      {day.category === 'future' && (
-                        <div className="text-[10px] text-slate-400 truncate">
-                          Shift: 9 AM
-                        </div>
-                      )}
-
-                      {day.category === 'absent' && (
-                        <div className="text-[10px] font-bold text-rose-600">
-                          Absent
-                        </div>
+                    {/* Date Number / Vibrant Circular Blue Badge */}
+                    <div className="relative flex items-center justify-center">
+                      {isSelected ? (
+                        <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0088FF] text-white font-bold text-sm sm:text-base flex items-center justify-center shadow-md shadow-blue-500/30 transition-transform scale-105">
+                          {day.dateNumber}
+                        </span>
+                      ) : day.isToday ? (
+                        <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-full ring-2 ring-[#0088FF] text-[#0088FF] font-bold text-sm sm:text-base flex items-center justify-center bg-blue-50/60 transition-transform group-hover:scale-105">
+                          {day.dateNumber}
+                        </span>
+                      ) : (
+                        <span className="text-slate-800 font-medium sm:font-semibold text-sm sm:text-base transition-colors group-hover:text-blue-600">
+                          {day.dateNumber}
+                        </span>
                       )}
                     </div>
 
-                    {/* Mobile Label / Micro Tag */}
-                    <div className="sm:hidden mt-0.5 text-[9px] font-bold truncate w-full text-slate-500">
-                      {day.category === 'holiday' && <span className="text-purple-600">Holiday</span>}
-                      {day.category === 'leave' && <span className="text-sky-600">Leave</span>}
-                      {day.category === 'present' && <span className="text-emerald-600">Present</span>}
-                      {day.category === 'late' && <span className="text-amber-600">Late</span>}
-                      {day.category === 'weekend' && <span>Off</span>}
+                    {/* Small dots underneath */}
+                    <div className="h-2 flex items-center justify-center gap-1 mt-1">
+                      {dots.map((dotClass, dIdx) => (
+                        <span
+                          key={dIdx}
+                          className={`w-1.5 h-1.5 rounded-full ${dotClass} transition-transform group-hover:scale-125`}
+                        />
+                      ))}
                     </div>
                   </button>
                 );
@@ -674,213 +566,226 @@ export default function EmployeeAttendance() {
           </div>
 
           {/* Day Inspection Details Card (Shown for Selected Date) */}
-          {selectedDayInfo && (
-            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Day Inspection Details
-                    </span>
-                    {selectedDayInfo.isToday && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
-                        Current Day
+          {selectedDayInfo && (() => {
+            // colored left border per category
+            const borderColor = {
+              present : 'border-l-emerald-500',
+              late    : 'border-l-amber-500',
+              leave   : 'border-l-sky-500',
+              holiday : 'border-l-purple-500',
+              weekend : 'border-l-slate-300',
+              absent  : 'border-l-rose-500',
+              future  : 'border-l-slate-300',
+            }[selectedDayInfo.category] ?? 'border-l-slate-200';
+
+            return (
+              <div className={`bg-white rounded-2xl border border-slate-200/80 border-l-4 ${borderColor} shadow-md p-4 sm:p-6 space-y-4 animate-in fade-in duration-200`}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        Day Inspection Details
+                      </span>
+                      {selectedDayInfo.isToday && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm">
+                          Today
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 mt-0.5">
+                      {new Date(selectedDayInfo.dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </h3>
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className="self-start sm:self-auto">
+                    {selectedDayInfo.category === 'holiday' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-purple-100 text-purple-800 border border-purple-200 shadow-sm">
+                        <PartyPopper className="w-4 h-4 text-purple-600" />
+                        {selectedDayInfo.holiday?.type || 'Public Holiday'}
+                      </span>
+                    )}
+                    {selectedDayInfo.category === 'leave' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-sky-100 text-sky-800 border border-sky-200 shadow-sm">
+                        <Palmtree className="w-4 h-4 text-sky-600" />
+                        {selectedDayInfo.leave?.type} ({selectedDayInfo.leave?.status})
+                      </span>
+                    )}
+                    {selectedDayInfo.category === 'present' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-sm">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        Present (Biometric Verified)
+                      </span>
+                    )}
+                    {selectedDayInfo.category === 'late' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-amber-100 text-amber-800 border border-amber-200 shadow-sm">
+                        <AlertCircle className="w-4 h-4 text-amber-600" />
+                        Late Arrival (Approved)
+                      </span>
+                    )}
+                    {selectedDayInfo.category === 'weekend' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 border border-slate-200 shadow-sm">
+                        <Sun className="w-4 h-4 text-slate-500" />
+                        Weekly Rest Off
+                      </span>
+                    )}
+                    {selectedDayInfo.category === 'future' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 shadow-sm">
+                        <Clock className="w-4 h-4 text-slate-500" />
+                        Upcoming Scheduled Shift
+                      </span>
+                    )}
+                    {selectedDayInfo.category === 'absent' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-rose-100 text-rose-800 border border-rose-200 shadow-sm">
+                        <X className="w-4 h-4 text-rose-600" />
+                        Unexcused Absence
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 mt-0.5">
-                    {new Date(selectedDayInfo.dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </h3>
                 </div>
 
-                {/* Status Badge */}
-                <div className="self-start sm:self-auto">
-                  {selectedDayInfo.category === 'holiday' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-purple-100 text-purple-800 border border-purple-200">
-                      <PartyPopper className="w-4 h-4 text-purple-600" />
-                      {selectedDayInfo.holiday?.type || 'Public Holiday'}
-                    </span>
-                  )}
-                  {selectedDayInfo.category === 'leave' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-sky-100 text-sky-800 border border-sky-200">
-                      <Palmtree className="w-4 h-4 text-sky-600" />
-                      {selectedDayInfo.leave?.type} ({selectedDayInfo.leave?.status})
-                    </span>
-                  )}
-                  {selectedDayInfo.category === 'present' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      Present (Biometric Verified)
-                    </span>
-                  )}
-                  {selectedDayInfo.category === 'late' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-amber-100 text-amber-800 border border-amber-200">
-                      <AlertCircle className="w-4 h-4 text-amber-600" />
-                      Late Arrival (Approved)
-                    </span>
-                  )}
-                  {selectedDayInfo.category === 'weekend' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 border border-slate-200">
-                      <Sun className="w-4 h-4 text-slate-500" />
-                      Weekly Rest Off
-                    </span>
-                  )}
-                  {selectedDayInfo.category === 'future' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700">
-                      <Clock className="w-4 h-4 text-slate-500" />
-                      Upcoming Scheduled Shift
-                    </span>
-                  )}
-                  {selectedDayInfo.category === 'absent' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs bg-rose-100 text-rose-800 border border-rose-200">
-                      <X className="w-4 h-4 text-rose-600" />
-                      Unexcused Absence
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Day Specific Breakdown */}
-              {selectedDayInfo.category === 'holiday' ? (
-                <div className="bg-purple-50/60 rounded-xl p-4 border border-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold">
-                      🎉
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-purple-950 text-sm sm:text-base">
-                        {selectedDayInfo.holiday?.name}
-                      </h4>
-                      <p className="text-xs text-purple-700 mt-0.5">
-                        Statutory paid time-off across all company offices and facilities.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-xs font-bold text-purple-800 bg-white/80 px-3 py-1.5 rounded-lg border border-purple-200 self-start sm:self-auto">
-                    {selectedDayInfo.holiday?.type}
-                  </div>
-                </div>
-              ) : selectedDayInfo.category === 'leave' ? (
-                <div className="bg-sky-50/60 rounded-xl p-4 border border-sky-100 space-y-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
+                {/* Day Specific Breakdown */}
+                {selectedDayInfo.category === 'holiday' ? (
+                  <div className="bg-purple-50/60 rounded-xl p-4 border border-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold">
-                        🏖️
+                      <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold">
+                        🎉
                       </div>
                       <div>
-                        <h4 className="font-bold text-sky-950 text-sm sm:text-base">
-                          {selectedDayInfo.leave?.type}
+                        <h4 className="font-bold text-purple-950 text-sm sm:text-base">
+                          {selectedDayInfo.holiday?.name}
                         </h4>
-                        <p className="text-xs text-sky-700 mt-0.5">
-                          Reason: {selectedDayInfo.leave?.reason || 'Personal time-off request'}
+                        <p className="text-xs text-purple-700 mt-0.5">
+                          Statutory paid time-off across all company offices and facilities.
                         </p>
                       </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-white text-emerald-700 border border-emerald-200">
-                      Status: {selectedDayInfo.leave?.status}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 text-xs border-t border-sky-100">
-                    <div>
-                      <span className="text-sky-600 font-medium">Requested Duration:</span>
-                      <div className="font-bold text-slate-800">{selectedDayInfo.leave?.days || 1} Day(s)</div>
-                    </div>
-                    <div>
-                      <span className="text-sky-600 font-medium">Approved By:</span>
-                      <div className="font-bold text-slate-800">{selectedDayInfo.leave?.approver || 'Marcus Sterling'}</div>
-                    </div>
-                    <div>
-                      <span className="text-sky-600 font-medium">Applied Date:</span>
-                      <div className="font-bold text-slate-800">{selectedDayInfo.leave?.appliedOn || 'Recent'}</div>
+                    <div className="text-xs font-bold text-purple-800 bg-white/80 px-3 py-1.5 rounded-lg border border-purple-200 self-start sm:self-auto">
+                      {selectedDayInfo.holiday?.type}
                     </div>
                   </div>
-                </div>
-              ) : selectedDayInfo.category === 'weekend' ? (
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold">
-                    ☕
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-800 text-sm sm:text-base">
-                      Weekend Rest Day
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Standard corporate non-working day. Overtime policies apply if on-call support is activated.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                /* Workday / Present / Late / Scheduled / Absent */
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">First Punch In</span>
-                      <div className="text-base font-black font-mono text-slate-900 mt-1">
-                        {selectedDayInfo.attendanceRecord?.in || (selectedDayInfo.category === 'future' ? '09:00 AM' : '—')}
+                ) : selectedDayInfo.category === 'leave' ? (
+                  <div className="bg-sky-50/60 rounded-xl p-4 border border-sky-100 space-y-3">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold">
+                          🏖️
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sky-950 text-sm sm:text-base">
+                            {selectedDayInfo.leave?.type}
+                          </h4>
+                          <p className="text-xs text-sky-700 mt-0.5">
+                            Reason: {selectedDayInfo.leave?.reason || 'Personal time-off request'}
+                          </p>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-slate-500">
-                        {selectedDayInfo.attendanceRecord ? 'Terminal 04 (HQ)' : 'Scheduled'}
+                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-white text-emerald-700 border border-emerald-200">
+                        Status: {selectedDayInfo.leave?.status}
                       </span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Last Punch Out</span>
-                      <div className="text-base font-black font-mono text-slate-900 mt-1">
-                        {selectedDayInfo.attendanceRecord?.out || (selectedDayInfo.category === 'future' ? '06:00 PM' : '—')}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 text-xs border-t border-sky-100">
+                      <div>
+                        <span className="text-sky-600 font-medium">Requested Duration:</span>
+                        <div className="font-bold text-slate-800">{selectedDayInfo.leave?.days || 1} Day(s)</div>
                       </div>
-                      <span className="text-[10px] text-slate-500">
-                        {selectedDayInfo.attendanceRecord ? 'Biometric Exit' : 'Scheduled'}
-                      </span>
-                    </div>
-
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Working Hours</span>
-                      <div className="text-base font-black text-emerald-600 mt-1">
-                        {selectedDayInfo.attendanceRecord?.hours || (selectedDayInfo.category === 'future' ? '9h 00m' : '—')}
+                      <div>
+                        <span className="text-sky-600 font-medium">Approved By:</span>
+                        <div className="font-bold text-slate-800">{selectedDayInfo.leave?.approver || 'Marcus Sterling'}</div>
                       </div>
-                      <span className="text-[10px] text-slate-500">8h Base Requirement</span>
-                    </div>
-
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Shift Assigned</span>
-                      <div className="text-base font-black text-slate-800 mt-1">General</div>
-                      <span className="text-[10px] text-slate-500">09:00 AM – 06:00 PM</span>
+                      <div>
+                        <span className="text-sky-600 font-medium">Applied Date:</span>
+                        <div className="font-bold text-slate-800">{selectedDayInfo.leave?.appliedOn || 'Recent'}</div>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 text-xs">
-                    <div className="flex items-center gap-2 text-slate-500">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                      <span>
-                        Verification:{' '}
-                        <strong className="text-slate-800">
-                          {selectedDayInfo.attendanceRecord?.notes || 'Face Biometric Match (99.8%)'}
-                        </strong>
-                      </span>
+                ) : selectedDayInfo.category === 'weekend' ? (
+                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold">
+                      ☕
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setCorrectionReqTime(selectedDayInfo.attendanceRecord?.in || '09:00 AM');
-                          setShowCorrectionModal(true);
-                        }}
-                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-colors cursor-pointer"
-                      >
-                        Request Punch Correction
-                      </button>
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm sm:text-base">
+                        Weekend Rest Day
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Standard corporate non-working day. Overtime policies apply if on-call support is activated.
+                      </p>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                ) : (
+                  /* Workday / Present / Late / Scheduled / Absent */
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">First Punch In</span>
+                        <div className="text-base font-black font-mono text-slate-900 mt-1">
+                          {selectedDayInfo.attendanceRecord?.in || (selectedDayInfo.category === 'future' ? '09:00 AM' : '—')}
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          {selectedDayInfo.attendanceRecord ? 'Terminal 04 (HQ)' : 'Scheduled'}
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Last Punch Out</span>
+                        <div className="text-base font-black font-mono text-slate-900 mt-1">
+                          {selectedDayInfo.attendanceRecord?.out || (selectedDayInfo.category === 'future' ? '06:00 PM' : '—')}
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          {selectedDayInfo.attendanceRecord ? 'Biometric Exit' : 'Scheduled'}
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Working Hours</span>
+                        <div className="text-base font-black text-emerald-600 mt-1">
+                          {selectedDayInfo.attendanceRecord?.hours || (selectedDayInfo.category === 'future' ? '9h 00m' : '—')}
+                        </div>
+                        <span className="text-[10px] text-slate-500">8h Base Requirement</span>
+                      </div>
+
+                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Shift Assigned</span>
+                        <div className="text-base font-black text-slate-800 mt-1">General</div>
+                        <span className="text-[10px] text-slate-500">09:00 AM – 06:00 PM</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 text-xs">
+                      <div className="flex items-center gap-2 text-slate-500">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                        <span>
+                          Verification:{' '}
+                          <strong className="text-slate-800">
+                            {selectedDayInfo.attendanceRecord?.notes || 'Face Biometric Match (99.8%)'}
+                          </strong>
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setCorrectionReqTime(selectedDayInfo.attendanceRecord?.in || '09:00 AM');
+                            setShowCorrectionModal(true);
+                          }}
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-colors cursor-pointer"
+                        >
+                          Request Punch Correction
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       ) : (
         /* ================= TIMESHEET LIST VIEW ================= */

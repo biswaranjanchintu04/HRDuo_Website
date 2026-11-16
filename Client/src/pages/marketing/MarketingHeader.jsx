@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { ChevronDown, ArrowRight, Menu, X, Sparkles, ScanFace, Shield, IndianRupee } from 'lucide-react';
+import { 
+  ChevronDown, ArrowRight, Menu, X, Sparkles, ScanFace, 
+  MapPin, Wallet, CalendarCheck, Clock, Building2, 
+  Dumbbell, GraduationCap, Stethoscope, User, LogIn
+} from 'lucide-react';
 
 export function MarketingHeader() {
   const navigate = useNavigate();
@@ -8,21 +12,27 @@ export function MarketingHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [suitesOpen, setSuitesOpen] = useState(false);
+  
+  const solutionsRef = useRef(null);
+  const suitesRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (solutionsRef.current && !solutionsRef.current.contains(event.target)) {
         setSolutionsOpen(false);
+      }
+      if (suitesRef.current && !suitesRef.current.contains(event.target)) {
+        setSuitesOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -33,6 +43,7 @@ export function MarketingHeader() {
   useEffect(() => {
     setMobileMenuOpen(false);
     setSolutionsOpen(false);
+    setSuitesOpen(false);
   }, [location.pathname]);
 
   const isActive = (path) => {
@@ -40,282 +51,356 @@ export function MarketingHeader() {
     return location.pathname.startsWith(path);
   };
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Solutions', path: '/solutions', hasDropdown: true },
-    { name: 'About', path: '/about' },
-    { name: 'Services', path: '/services' },
-    { name: 'Pricing', path: '/pricing' },
-    { name: 'Contact', path: '/contact' }
+  const solutionModules = [
+    {
+      title: "Touchless Face Kiosk",
+      desc: "Sub-second AI recognition with anti-spoof liveness check",
+      icon: ScanFace,
+      path: "/solutions",
+      badge: "< 1s Speed"
+    },
+    {
+      title: "GPS Geofenced Punch",
+      desc: "Perimeter validation with satellite anti-mock lock",
+      icon: MapPin,
+      path: "/solutions",
+      badge: "Mobile GPS"
+    },
+    {
+      title: "Attendance-Linked Payroll",
+      desc: "1-click salary calculations and automated payslip batch",
+      icon: Wallet,
+      path: "/solutions",
+      badge: "Automated"
+    },
+    {
+      title: "2-Step Leave Approvals",
+      desc: "Manager approval to HR verification with auto deductions",
+      icon: CalendarCheck,
+      path: "/solutions",
+      badge: "2-Step Flow"
+    },
+    {
+      title: "Shift Rosters & Rotations",
+      desc: "Multi-branch rosters, night shifts, and grace windows",
+      icon: Clock,
+      path: "/solutions",
+      badge: "Zero Conflict"
+    }
+  ];
+
+  const industrySuites = [
+    {
+      title: "Corporate & Enterprise",
+      desc: "Multi-branch rosters, geofenced mobile check-in & payroll",
+      icon: Building2,
+      path: "/solutions"
+    },
+    {
+      title: "Gym & Fitness Suite",
+      desc: "Member turnstile integrations, trainer check-ins & hourly logs",
+      icon: Dumbbell,
+      path: "/solutions"
+    },
+    {
+      title: "Education & Campus",
+      desc: "Faculty biometric kiosk, RFID support & student alerts",
+      icon: GraduationCap,
+      path: "/solutions"
+    },
+    {
+      title: "Healthcare Organizations",
+      desc: "24/7 rotational nurse shifts, on-call doctor logs & compliance",
+      icon: Stethoscope,
+      path: "/solutions"
+    }
   ];
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pointer-events-none">
-      <nav className={`pointer-events-auto bg-white/95 backdrop-blur-md border border-[#F1E8D9] rounded-full px-4 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between transition-all duration-300 ${
-        scrolled ? 'shadow-[0_12px_36px_rgba(0,0,0,0.1)]' : 'shadow-[0_8px_30px_rgba(0,0,0,0.06)]'
+    <header className="fixed top-3 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pointer-events-none">
+      <nav className={`pointer-events-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl sm:rounded-full px-4 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between transition-all duration-300 ${
+        scrolled 
+          ? 'shadow-[0_10px_30px_rgba(0,45,98,0.08)] border-slate-300' 
+          : 'shadow-[0_4px_20px_rgba(0,45,98,0.04)]'
       }`}>
 
-        {/* Left: Official HRDuo Brand Logo */}
-        <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+        {/* Left: Brand Logo & Tagline */}
+        <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
           <img
             src="/hrduo_logo.png"
             alt="HRDuo Logo"
-            className="h-8 sm:h-9 w-auto object-contain hover:opacity-90 transition-opacity"
+            className="h-8 sm:h-9 w-auto object-contain hover:opacity-95 transition-opacity"
           />
+          <span className="hidden xl:inline-block text-[11px] font-semibold tracking-wide text-[#627D98] border-l border-slate-200 pl-2.5">
+            Smart HR. Stronger Together.
+          </span>
         </Link>
 
         {/* Center: Desktop Navigation Links */}
-        <div className="hidden md:flex items-center gap-1 lg:gap-1.5 text-sm font-semibold text-slate-700">
+        <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 text-sm font-semibold text-[#334E68]">
           
           {/* Home Link */}
           <Link
             to="/"
-            className={`px-4 py-1.5 rounded-full transition-all duration-200 ${
+            className={`px-3 py-1.5 rounded-full transition-all duration-150 ${
               isActive('/')
-                ? 'bg-[#FFC933] text-slate-950 font-bold shadow-sm'
-                : 'hover:text-slate-950 text-slate-700 hover:bg-slate-50'
+                ? 'bg-[#EBF3FA] text-[#002D62] font-bold'
+                : 'hover:text-[#002D62] hover:bg-slate-50'
             }`}
           >
             Home
           </Link>
 
-          {/* Solutions with Submenu */}
-          <div className="relative" ref={dropdownRef}>
-            <div className="flex items-center">
-              <Link
-                to="/solutions"
-                className={`pl-3.5 pr-1 py-1.5 rounded-l-full transition-all duration-200 ${
-                  isActive('/solutions')
-                    ? 'bg-[#FFC933] text-slate-950 font-bold shadow-sm'
-                    : 'hover:text-slate-950 text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                Solutions
-              </Link>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSolutionsOpen(!solutionsOpen);
-                }}
-                aria-label="Toggle solutions submenu"
-                className={`pr-2.5 pl-1 py-2 rounded-r-full transition-all duration-200 ${
-                  isActive('/solutions')
-                    ? 'bg-[#FFC933] text-slate-950 font-bold'
-                    : 'hover:text-slate-950 text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${solutionsOpen ? 'rotate-180' : ''}`} />
-              </button>
-            </div>
+          {/* Solutions Dropdown */}
+          <div className="relative" ref={solutionsRef}>
+            <button
+              onClick={() => {
+                setSolutionsOpen(!solutionsOpen);
+                setSuitesOpen(false);
+              }}
+              className={`px-3 py-1.5 rounded-full transition-all duration-150 flex items-center gap-1 cursor-pointer ${
+                isActive('/solutions') || solutionsOpen
+                  ? 'bg-[#EBF3FA] text-[#002D62] font-bold'
+                  : 'hover:text-[#002D62] hover:bg-slate-50'
+              }`}
+            >
+              <span>Solutions</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${solutionsOpen ? 'rotate-180 text-[#00A8A8]' : ''}`} />
+            </button>
 
             {solutionsOpen && (
-              <div className="absolute top-full mt-2 left-0 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <Link
-                  to="/solutions"
-                  onClick={() => setSolutionsOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-50 text-slate-800"
-                >
-                  <ScanFace className="w-4 h-4 text-[#008C75]" />
-                  <div>
-                    <div>AI Face Attendance Kiosk</div>
-                    <div className="text-[10px] text-slate-500 font-normal">Sub-200ms edge matching</div>
-                  </div>
-                </Link>
-
-                <Link
-                  to="/solutions"
-                  onClick={() => setSolutionsOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-50 text-slate-800"
-                >
-                  <IndianRupee className="w-4 h-4 text-[#FF5A36]" />
-                  <div>
-                    <div>Automated Dynamic Payroll</div>
-                    <div className="text-[10px] text-slate-500 font-normal">1-click salary calculations</div>
-                  </div>
-                </Link>
-
-                <Link
-                  to="/security"
-                  onClick={() => setSolutionsOpen(false)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-50 text-slate-800"
-                >
-                  <Shield className="w-4 h-4 text-indigo-600" />
-                  <div>
-                    <div>Vector Security & Privacy</div>
-                    <div className="text-[10px] text-slate-500 font-normal">Zero raw photo storage</div>
-                  </div>
-                </Link>
+              <div className="absolute top-full left-0 mt-3 w-[360px] bg-white rounded-2xl border border-slate-200 shadow-xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#627D98] px-3 py-1.5 border-b border-slate-100 flex items-center justify-between">
+                  <span>Core HRMS Modules</span>
+                  <span className="text-[#00A8A8] font-semibold">5 Modules</span>
+                </div>
+                <div className="space-y-1 mt-1.5">
+                  {solutionModules.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        to={item.path}
+                        onClick={() => setSolutionsOpen(false)}
+                        className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#EBF3FA] transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-[#EBF3FA] text-[#002D62] group-hover:bg-[#002D62] group-hover:text-white flex items-center justify-center flex-shrink-0 transition-colors">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-[#002D62] group-hover:text-[#002D62]">
+                              {item.title}
+                            </span>
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-[#00A8A8]">
+                              {item.badge}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-[#627D98] truncate mt-0.5">
+                            {item.desc}
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
 
-          {/* About Link */}
-          <Link
-            to="/about"
-            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
-              isActive('/about')
-                ? 'bg-[#FFC933] text-slate-950 font-bold shadow-sm'
-                : 'hover:text-slate-950 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            About
-          </Link>
+          {/* Industry Suites Dropdown */}
+          <div className="relative" ref={suitesRef}>
+            <button
+              onClick={() => {
+                setSuitesOpen(!suitesOpen);
+                setSolutionsOpen(false);
+              }}
+              className={`px-3 py-1.5 rounded-full transition-all duration-150 flex items-center gap-1 cursor-pointer ${
+                suitesOpen
+                  ? 'bg-[#EBF3FA] text-[#002D62] font-bold'
+                  : 'hover:text-[#002D62] hover:bg-slate-50'
+              }`}
+            >
+              <span>Industry Suites</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${suitesOpen ? 'rotate-180 text-[#00A8A8]' : ''}`} />
+            </button>
 
-          {/* Services Link */}
-          <Link
-            to="/services"
-            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
-              isActive('/services')
-                ? 'bg-[#FFC933] text-slate-950 font-bold shadow-sm'
-                : 'hover:text-slate-950 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            Services
-          </Link>
+            {suitesOpen && (
+              <div className="absolute top-full left-0 mt-3 w-[340px] bg-white rounded-2xl border border-slate-200 shadow-xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#627D98] px-3 py-1.5 border-b border-slate-100">
+                  Tailored Industry Solutions
+                </div>
+                <div className="space-y-1 mt-1.5">
+                  {industrySuites.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        to={item.path}
+                        onClick={() => setSuitesOpen(false)}
+                        className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#EBF3FA] transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-[#E6F8F8] text-[#00A8A8] group-hover:bg-[#00A8A8] group-hover:text-white flex items-center justify-center flex-shrink-0 transition-colors">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-bold text-[#002D62] block">
+                            {item.title}
+                          </span>
+                          <p className="text-[11px] text-[#627D98] truncate mt-0.5">
+                            {item.desc}
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Pricing Link */}
           <Link
             to="/pricing"
-            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
+            className={`px-3 py-1.5 rounded-full transition-all duration-150 ${
               isActive('/pricing')
-                ? 'bg-[#FFC933] text-slate-950 font-bold shadow-sm'
-                : 'hover:text-slate-950 text-slate-700 hover:bg-slate-50'
+                ? 'bg-[#EBF3FA] text-[#002D62] font-bold'
+                : 'hover:text-[#002D62] hover:bg-slate-50'
             }`}
           >
             Pricing
           </Link>
 
+          {/* About Link */}
+          <Link
+            to="/about"
+            className={`px-3 py-1.5 rounded-full transition-all duration-150 ${
+              isActive('/about')
+                ? 'bg-[#EBF3FA] text-[#002D62] font-bold'
+                : 'hover:text-[#002D62] hover:bg-slate-50'
+            }`}
+          >
+            About
+          </Link>
+
           {/* Contact Link */}
           <Link
             to="/contact"
-            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
+            className={`px-3 py-1.5 rounded-full transition-all duration-150 ${
               isActive('/contact')
-                ? 'bg-[#FFC933] text-slate-950 font-bold shadow-sm'
-                : 'hover:text-slate-950 text-slate-700 hover:bg-slate-50'
+                ? 'bg-[#EBF3FA] text-[#002D62] font-bold'
+                : 'hover:text-[#002D62] hover:bg-slate-50'
             }`}
           >
             Contact
           </Link>
+
         </div>
 
-        {/* Right: Login Link & Get Started Pill Button */}
-        <div className="hidden sm:flex items-center gap-3 md:gap-4">
+        {/* Right: Actions */}
+        <div className="hidden sm:flex items-center gap-3">
+          
+          {/* Employee Sign In */}
           <Link
-            to="/login"
-            className="text-sm font-bold text-slate-800 hover:text-[#008C75] px-3 py-1.5 transition-colors"
+            to="/employee/login"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#002D62] hover:text-[#00A8A8] px-3 py-2 rounded-full hover:bg-slate-50 transition-colors"
           >
-            Login
+            <User className="w-3.5 h-3.5 text-[#00A8A8]" />
+            <span>Employee Login</span>
           </Link>
 
+          {/* Primary CTA: Schedule Demo in HRDuo Brand Colors */}
           <button
             onClick={() => navigate('/contact')}
-            className="bg-[#FFD027] hover:bg-[#F5C21B] text-slate-950 px-5 py-2 rounded-full font-black text-sm flex items-center gap-1.5 border-2 border-slate-950 shadow-[2.5px_2.5px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
+            className="bg-gradient-to-r from-[#002D62] to-[#004B8D] hover:from-[#001E42] hover:to-[#003B73] text-white text-xs sm:text-sm font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-full flex items-center gap-2 shadow-md shadow-blue-900/15 hover:shadow-lg transition-all cursor-pointer"
           >
-            <span>Book a Consultation</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            <span>Schedule Demo</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#00C9CE]" />
           </button>
         </div>
 
         {/* Mobile Hamburger Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-full hover:bg-slate-100 text-slate-700"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex sm:hidden items-center gap-2">
+          <button
+            onClick={() => navigate('/contact')}
+            className="bg-[#002D62] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-xs"
+          >
+            Demo
+          </button>
+          
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-xl text-[#002D62] hover:bg-slate-100 transition-colors"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+
       </nav>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="pointer-events-auto md:hidden mt-2 bg-white rounded-3xl border border-[#F1E8D9] shadow-2xl p-5 space-y-3 animate-in fade-in slide-in-from-top-4 duration-200">
-          <div className="flex flex-col gap-1 text-sm font-semibold text-slate-700">
+        <div className="pointer-events-auto sm:hidden mt-2 bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="space-y-1 pb-3 border-b border-slate-100 font-semibold text-sm">
             <Link
               to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
+              className={`block px-3 py-2 rounded-xl ${isActive('/') ? 'bg-[#EBF3FA] text-[#002D62] font-bold' : 'text-[#334E68]'}`}
             >
               Home
             </Link>
             <Link
               to="/solutions"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/solutions') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
+              className={`block px-3 py-2 rounded-xl ${isActive('/solutions') ? 'bg-[#EBF3FA] text-[#002D62] font-bold' : 'text-[#334E68]'}`}
             >
-              Solutions
-            </Link>
-            <Link
-              to="/about"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/about') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
-            >
-              About
-            </Link>
-            <Link
-              to="/services"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/services') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
-            >
-              Services
+              Solutions & Modules
             </Link>
             <Link
               to="/pricing"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/pricing') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
+              className={`block px-3 py-2 rounded-xl ${isActive('/pricing') ? 'bg-[#EBF3FA] text-[#002D62] font-bold' : 'text-[#334E68]'}`}
             >
               Pricing
             </Link>
             <Link
-              to="/security"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/security') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
+              to="/about"
+              className={`block px-3 py-2 rounded-xl ${isActive('/about') ? 'bg-[#EBF3FA] text-[#002D62] font-bold' : 'text-[#334E68]'}`}
             >
-              Security & Privacy
+              About Us
             </Link>
             <Link
               to="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-2xl transition-colors ${
-                isActive('/contact') ? 'bg-[#FFC933] text-slate-950 font-bold' : 'hover:bg-slate-50'
-              }`}
+              className={`block px-3 py-2 rounded-xl ${isActive('/contact') ? 'bg-[#EBF3FA] text-[#002D62] font-bold' : 'text-[#334E68]'}`}
             >
-              Contact
+              Contact Sales
             </Link>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+          <div className="space-y-2 pt-1">
             <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 rounded-full font-bold text-sm text-slate-800 border border-slate-200 hover:bg-slate-50"
+              to="/employee/login"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-[#002D62] hover:bg-slate-50 transition-colors"
             >
-              Login to Portal
+              <User className="w-4 h-4 text-[#00A8A8]" />
+              <span>Employee Portal</span>
+            </Link>
+            <Link
+              to="/admin/login"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-[#334E68] hover:bg-slate-50 transition-colors"
+            >
+              <LogIn className="w-4 h-4 text-[#002D62]" />
+              <span>Admin Portal</span>
             </Link>
             <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigate('/contact');
-              }}
-              className="w-full py-2.5 rounded-full font-black text-sm bg-[#FFD027] text-slate-950 flex items-center justify-center gap-1.5 border-2 border-slate-950 shadow-[2.5px_2.5px_0px_#000]"
+              onClick={() => navigate('/contact')}
+              className="w-full bg-gradient-to-r from-[#002D62] to-[#004B8D] text-white text-xs font-bold py-3 rounded-xl shadow-md flex items-center justify-center gap-2"
             >
-              <span>Book a Consultation</span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+              <span>Schedule a Demo</span>
+              <ArrowRight className="w-4 h-4 text-[#00C9CE]" />
             </button>
           </div>
         </div>
       )}
+
     </header>
   );
 }

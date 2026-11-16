@@ -1,88 +1,94 @@
 import React, { useState } from 'react';
 import { Check, Sparkles, ArrowRight } from 'lucide-react';
-import { Badge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 export function PricingBento() {
   const [annual, setAnnual] = useState(true);
+  const navigate = useNavigate();
 
   const tiers = [
     {
       name: "Starter",
-      desc: "For growing teams seeking modern hardware-free attendance.",
-      price: annual ? 1999 : 2499,
+      desc: "For small teams starting with mobile GPS & kiosk attendance.",
+      price: annual ? 1499 : 1899,
       period: "/month",
       highlight: false,
       features: [
         "Up to 25 Active Employees",
         "Unlimited Face Attendance Kiosks",
-        "Sub-200ms Biometric Matching",
-        "Basic Leave Management",
-        "CSV & Excel Reports",
+        "Sub-Second Biometric Matching",
+        "GPS Geofencing Mobile Punch",
+        "Standard Leave Management",
+        "CSV & Excel Timesheet Reports",
         "Standard Email Support"
       ]
     },
     {
-      name: "Growth & Business",
-      desc: "Complete workforce automation with integrated dynamic payroll.",
-      price: annual ? 4799 : 5999,
+      name: "Pro Workforce",
+      desc: "Complete workforce automation with attendance-linked payroll.",
+      price: annual ? 3999 : 4999,
       period: "/month",
       highlight: true,
       badge: "Most Popular",
       features: [
-        "Up to 150 Active Employees",
+        "Up to 100 Active Employees",
         "Unlimited Face Attendance Kiosks",
-        "Automated Dynamic Payroll Engine",
-        "Multi-Tier Shift Management",
-        "Liveness Anti-Spoof Protection",
+        "Attendance-Linked Payroll Engine",
+        "2-Step Leave Approvals (Manager → HR)",
+        "Multi-Branch & Shift Rosters",
+        "Anti-Spoofing & Liveness AI",
         "Batch PDF Payslip Generation",
-        "Priority 24/7 Slack Support"
+        "Priority 24/7 Support"
       ]
     },
     {
       name: "Enterprise",
-      desc: "Custom deployment, dedicated database instances, and SLA.",
-      price: annual ? 11999 : 14999,
+      desc: "Tailored for large organizations, campuses, and gym suites.",
+      price: annual ? 8999 : 10999,
       period: "/month",
       highlight: false,
       features: [
-        "Unlimited Employees & Branches",
-        "Dedicated Multi-Tenant Instance",
+        "Unlimited Employees & Locations",
+        "Turnstile & Biometric Hardware API",
+        "Custom Shift Patterns & Night Rosters",
         "Custom ERP & Webhook Integrations",
-        "Custom Facial AI Sensitivity Sliders",
         "Dedicated Account Specialist",
-        "99.99% Uptime Guarantee SLA"
+        "99.95% Enterprise SLA Guarantee"
       ]
     }
   ];
 
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-        <Badge variant="yellow">Transparent Pricing</Badge>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
-          Simple Plans for Teams of Any Size
+    <section id="pricing" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#EBF3FA] text-[#002D62] text-xs font-semibold border border-[#D9E2EC]">
+          <Sparkles className="w-3.5 h-3.5 text-[#00A8A8]" />
+          Transparent Pricing
+        </span>
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#002D62]">
+          Simple, Predictable Plans for Every Team
         </h2>
-        <p className="text-base sm:text-lg text-slate-600 font-medium">
-          Start with a 14-day risk-free trial. No credit card required.
+        <p className="text-base sm:text-lg text-[#334E68] font-normal">
+          Start with a 14-day risk-free trial. Zero hardware lock-in. No credit card required.
         </p>
 
         {/* Toggle Switch */}
-        <div className="pt-2 flex items-center justify-center gap-3">
-          <span className={`text-sm font-bold ${!annual ? 'text-slate-900' : 'text-slate-500'}`}>Monthly</span>
+        <div className="pt-4 flex items-center justify-center gap-3">
+          <span className={`text-sm font-semibold ${!annual ? 'text-[#002D62]' : 'text-[#627D98]'}`}>Monthly</span>
           <button
             onClick={() => setAnnual(!annual)}
-            className="w-14 h-8 rounded-full bg-[#FFC933] p-1 transition-colors relative border border-slate-900"
+            className="w-13 h-7 rounded-full bg-slate-200 p-1 transition-colors relative cursor-pointer"
+            aria-label="Toggle annual billing"
           >
             <div
-              className={`w-6 h-6 rounded-full bg-slate-950 transition-transform ${
+              className={`w-5 h-5 rounded-full bg-[#002D62] shadow-sm transition-transform ${
                 annual ? 'translate-x-6' : 'translate-x-0'
               }`}
             />
           </button>
           <div className="flex items-center gap-1.5">
-            <span className={`text-sm font-bold ${annual ? 'text-slate-900' : 'text-slate-500'}`}>Annual</span>
-            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-[#E6F7F5] text-[#008C75] border border-[#BCECE5]">
+            <span className={`text-sm font-semibold ${annual ? 'text-[#002D62]' : 'text-[#627D98]'}`}>Annual</span>
+            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E6F8F8] text-[#008585] border border-[#D0EFEF]">
               Save 20%
             </span>
           </div>
@@ -93,33 +99,33 @@ export function PricingBento() {
         {tiers.map((tier) => (
           <div
             key={tier.name}
-            className={`rounded-3xl sm:rounded-[2.5rem] p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 relative ${
+            className={`rounded-3xl p-8 sm:p-9 flex flex-col justify-between transition-all duration-300 relative ${
               tier.highlight
-                ? 'bg-white border-2 border-slate-900 shadow-2xl ring-4 ring-[#FFC933]/30 -translate-y-2'
-                : 'bg-white/95 border border-[#F1E8D9] shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl'
+                ? 'bg-white border-2 border-[#002D62] shadow-xl shadow-blue-900/10 -translate-y-2'
+                : 'bg-white border border-slate-200/90 shadow-sm hover:shadow-md hover:border-slate-300'
             }`}
           >
             {tier.highlight && (
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span className="bg-[#FFC933] text-slate-950 font-black text-xs px-4 py-1 rounded-full border border-slate-900 shadow-sm uppercase tracking-wider">
+                <span className="bg-gradient-to-r from-[#002D62] to-[#004B8D] text-white font-semibold text-xs px-4 py-1 rounded-full shadow-md uppercase tracking-wider">
                   {tier.badge}
                 </span>
               </div>
             )}
 
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-1">{tier.name}</h3>
-              <p className="text-slate-600 text-xs sm:text-sm min-h-[40px]">{tier.desc}</p>
+              <h3 className="text-xl font-bold text-[#002D62] mb-1">{tier.name}</h3>
+              <p className="text-[#486581] text-xs sm:text-sm min-h-[40px] leading-relaxed">{tier.desc}</p>
 
               <div className="my-6 pb-6 border-b border-slate-100 flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-black text-slate-900">₹{tier.price.toLocaleString('en-IN')}</span>
-                <span className="text-slate-500 font-semibold text-sm">{tier.period}</span>
+                <span className="text-4xl sm:text-5xl font-extrabold text-[#002D62]">₹{tier.price.toLocaleString('en-IN')}</span>
+                <span className="text-[#627D98] font-medium text-sm">{tier.period}</span>
               </div>
 
               <ul className="space-y-3 mb-8">
                 {tier.features.map((feat, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700">
-                    <div className="w-5 h-5 rounded-full bg-[#E6F7F5] flex items-center justify-center text-[#008C75] flex-shrink-0 mt-0.5">
+                  <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#334E68]">
+                    <div className="w-5 h-5 rounded-full bg-[#E6F8F8] flex items-center justify-center text-[#00A8A8] flex-shrink-0 mt-0.5">
                       <Check className="w-3.5 h-3.5" />
                     </div>
                     <span>{feat}</span>
@@ -128,14 +134,17 @@ export function PricingBento() {
               </ul>
             </div>
 
-            <Button
-              variant={tier.highlight ? 'primary' : 'outline'}
-              className="w-full justify-center py-3.5"
-              onClick={() => window.location.href = '/face-attendance'}
+            <button
+              className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                tier.highlight
+                  ? 'bg-gradient-to-r from-[#002D62] to-[#004B8D] hover:from-[#001E42] hover:to-[#003B73] text-white shadow-md'
+                  : 'bg-slate-50 hover:bg-slate-100 text-[#002D62] border border-slate-200'
+              }`}
+              onClick={() => navigate('/contact')}
             >
-              Get Started
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+              <span>Get Started</span>
+              <ArrowRight className="w-4 h-4 text-[#00C9CE]" />
+            </button>
           </div>
         ))}
       </div>

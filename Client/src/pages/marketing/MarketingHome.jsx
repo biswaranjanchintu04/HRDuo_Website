@@ -11,77 +11,50 @@ import { SecurityBento } from './SecurityBento';
 import { TestimonialsBento } from './TestimonialsBento';
 import { FaqBento } from './FaqBento';
 import { CtaBento } from './CtaBento';
-import { ArrowRight, Sparkles, Layers, ShieldCheck } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function MarketingHome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "HRDuo — Your People. Our Priority.";
+    document.title = "HRDuo — Smart HR. Stronger Together.";
   }, []);
 
   return (
     <div className="space-y-4">
-      {/* 1. Hero Section replicating the reference image exactly */}
+      {/* 1. Hero Section with HRDuo brand design */}
       <HeroBento />
 
       {/* 2. Metric Strip & Trust Badges */}
       <TrustBento />
 
-      {/* 3. Asymmetrical Bento Features Grid */}
+      {/* 3. Core Features Grid */}
       <FeaturesBento />
 
       {/* Section Jump to Solutions Page */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-[#F1E8D9] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="text-left space-y-1">
-            <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#FFC933]" />
+            <h3 className="text-lg sm:text-xl font-bold text-[#002D62] flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#00A8A8]" />
               Want to see all workforce modules in detail?
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium">
-              Explore deep dives into Facial Recognition, Shift Rosters, and Automated Dynamic Payroll.
+            <p className="text-xs sm:text-sm text-[#486581] font-normal">
+              Explore deep dives into Facial Recognition, Shift Rosters, Geofencing, and Attendance-Linked Payroll.
             </p>
           </div>
-          <Button
-            variant="primary"
-            size="md"
+          <button
             onClick={() => navigate('/solutions')}
-            className="whitespace-nowrap flex items-center gap-1.5 flex-shrink-0"
+            className="bg-gradient-to-r from-[#002D62] to-[#004B8D] hover:from-[#001E42] hover:to-[#003B73] text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 cursor-pointer shadow-sm"
           >
             <span>Explore All Solutions</span>
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+            <ArrowRight className="w-4 h-4 text-[#00C9CE]" />
+          </button>
         </div>
       </div>
 
-      {/* 4. Services Section replicating User's Reference Pipeline & Quote Card */}
+      {/* 4. Services Section */}
       <ServicesJourney />
-
-      {/* Section Jump to Services Page */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
-        <div className="bg-[#E6F7F5] rounded-3xl p-6 sm:p-8 border border-[#BCECE5] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-          <div className="text-left space-y-1">
-            <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-[#008C75]" />
-              Looking for Enterprise Deployment & White-Glove Setup?
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-700 font-medium">
-              Discover our hardware provisioning, custom ERP integrations, and 24/7 SLA guarantees.
-            </p>
-          </div>
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => navigate('/services')}
-            className="whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 bg-slate-900 text-white hover:bg-slate-800"
-          >
-            <span>View All Services & SLA</span>
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
 
       {/* 5. Deep-Dive Interactive Showcase (Attendance, Payroll, Leaves) */}
       <ShowcaseBento />

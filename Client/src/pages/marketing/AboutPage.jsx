@@ -12,42 +12,42 @@ import {
   Award,
   Globe2,
   CheckCircle2,
-  Lock
+  Lock,
+  Building2,
+  Smartphone
 } from 'lucide-react';
-import { Badge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Button';
 
 export default function AboutPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "About Us — HRDuo Story, Mission & Values";
+    document.title = "About Us — Smart HR. Stronger Together.";
   }, []);
 
   const values = [
     {
       icon: Zap,
-      title: "Uncompromising Speed",
-      desc: "Nobody should queue to clock in. We engineered our biometric pipeline to verify identities in under 200 milliseconds.",
-      color: "bg-[#FFC933] text-slate-950"
+      title: "Sub-Second Speed",
+      desc: "Nobody should queue to clock in. Our biometric pipeline verifies identities in under 400 milliseconds on standard web devices.",
+      color: "bg-[#EBF3FA] text-[#002D62]"
     },
     {
       icon: Lock,
-      title: "Privacy by Architecture",
-      desc: "We never store raw photos or video footage. Facial landmarks exist only as irreversible 128-D mathematical vectors.",
-      color: "bg-[#008C75] text-white"
+      title: "Zero Raw Photo Storage",
+      desc: "Privacy by design. Facial landmarks exist purely as irreversible 128-D mathematical vectors; raw camera frames are deleted immediately.",
+      color: "bg-[#E6F8F8] text-[#00A8A8]"
     },
     {
       icon: Target,
-      title: "Zero-Error Precision",
-      desc: "From anti-spoof liveness to statutory payroll deductions, our algorithms guarantee mathematical accuracy you can audit.",
-      color: "bg-[#FF5A36] text-white"
+      title: "Zero Hardware Lock-In",
+      desc: "Stop paying high AMC costs for fragile fingerprint sensors. Run touchless kiosks on any iPad, Android tablet, or laptop.",
+      color: "bg-[#EBF3FA] text-[#002D62]"
     },
     {
       icon: HeartHandshake,
-      title: "Human-Centric Simplicity",
-      desc: "Enterprise software shouldn't require weeks of training. We design interfaces that employees and managers love using.",
-      color: "bg-indigo-600 text-white"
+      title: "Single Integrated Ecosystem",
+      desc: "Biometric punches, shift rosters, leave approvals, and payroll run seamlessly in sync with zero spreadsheet export friction.",
+      color: "bg-[#E6F8F8] text-[#00A8A8]"
     }
   ];
 
@@ -55,99 +55,101 @@ export default function AboutPage() {
     {
       year: "2023",
       title: "The Problem Identified",
-      desc: "Frustrated by fingerprint smudge errors, buddy punching, and manual payroll sheets across multiple branches, our founders set out to build a hardware-free browser biometric engine."
+      desc: "Frustrated by fingerprint smudge errors, buddy punching, and manual payroll sheets across multiple branches, our team set out to build a hardware-free browser biometric engine."
     },
     {
       year: "2024",
-      title: "Sub-200ms Face AI Launch",
-      desc: "Released the proprietary edge face-matching kiosk algorithm, achieving 99.8% anti-spoof accuracy with zero physical contact."
+      title: "Sub-Second Face AI Launch",
+      desc: "Released our proprietary edge face-matching kiosk algorithm, achieving 99.4% anti-spoof accuracy with zero physical contact."
     },
     {
       year: "2025",
-      title: "Automated Dynamic Payroll Engine",
+      title: "Attendance-Linked Payroll Engine",
       desc: "Integrated live attendance directly into payroll rules, enabling organizations to run end-to-end salary calculations in a single click."
     },
     {
       year: "2026",
-      title: "Global Enterprise Scale",
-      desc: "Powering thousands of daily check-ins across manufacturing, healthcare, corporate offices, and educational institutions worldwide."
+      title: "Multi-Industry Suite Expansion",
+      desc: "Powering thousands of daily check-ins across Corporate Enterprises, Gym & Fitness Centers, Education Campuses, and Healthcare Organizations."
     }
   ];
 
   return (
-    <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-16 sm:space-y-24">
+    <div className="py-8 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-16 sm:space-y-24">
       
       {/* 1. About Hero Section */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <Badge variant="teal">
-          <Sparkles className="w-3.5 h-3.5 mr-1" />
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#EBF3FA] text-[#002D62] text-xs font-semibold border border-[#D9E2EC]">
+          <Sparkles className="w-3.5 h-3.5 text-[#00A8A8]" />
           Our Mission & Vision
-        </Badge>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight">
+        </span>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#002D62] leading-tight">
           Reimagining Workforce Technology for the <br />
-          <span className="text-[#008C75]">Modern Enterprise.</span>
+          <span className="text-[#00A8A8]">Modern Enterprise</span>
         </h1>
-        <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
-          HRDuo was born from a simple belief: managing your team shouldn't be bogged down by 
+        <p className="text-base sm:text-lg text-[#334E68] font-normal leading-relaxed">
+          Smart HR. Stronger Together. We believe managing your team shouldn't be bogged down by 
           outdated biometric machines, manual reconciliation errors, or disconnected spreadsheets.
         </p>
       </div>
 
-      {/* 2. Story Section: The Origin of HRDuo */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-white rounded-3xl sm:rounded-[2.5rem] border border-[#F1E8D9] p-8 sm:p-12 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+      {/* 2. Story Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-12 shadow-sm">
         <div className="lg:col-span-7 space-y-5">
-          <Badge variant="yellow">The Story</Badge>
-          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-snug">
-            Why We Founded HRDuo
+          <span className="text-xs font-bold uppercase tracking-wider text-[#00A8A8]">
+            The Problem & Innovation
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002D62] leading-snug">
+            Why We Built a Hardware-Free HRMS
           </h2>
-          <p className="text-slate-600 font-medium text-sm sm:text-base leading-relaxed">
+          <p className="text-[#334E68] font-normal text-sm sm:text-base leading-relaxed">
             For decades, companies spent lakhs of rupees installing clumsy fingerprint readers at entrance doors. 
             Employees had to wipe grease off sensors, lines stretched down the hall during shift changes, 
             and HR administrators spent weeks every month manually matching attendance punch records against payroll formulas.
           </p>
-          <p className="text-slate-600 font-medium text-sm sm:text-base leading-relaxed">
-            We asked: <strong className="text-slate-900">Why can’t attendance be as instantaneous and contactless as unlocking your smartphone?</strong> 
+          <p className="text-[#334E68] font-normal text-sm sm:text-base leading-relaxed">
+            We asked: <strong className="text-[#002D62] font-semibold">Why can’t attendance be as instantaneous and contactless as unlocking your smartphone?</strong> 
             And why shouldn't that verified check-in flow directly into payroll, shift management, and leave balances in real time?
           </p>
-          <p className="text-slate-600 font-medium text-sm sm:text-base leading-relaxed">
-            HRDuo answers that question. Today, our platform turns any web-enabled device into an intelligent biometric kiosk, 
+          <p className="text-[#334E68] font-normal text-sm sm:text-base leading-relaxed">
+            Our platform turns any web-enabled device into an intelligent biometric kiosk, 
             cutting hardware costs to zero while ensuring absolute data privacy.
           </p>
 
-          <div className="pt-2 flex items-center gap-6">
+          <div className="pt-3 flex flex-wrap items-center gap-6">
             <div>
-              <div className="text-2xl sm:text-3xl font-black text-slate-900">50,000+</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Daily Check-Ins</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#002D62]">50,000+</div>
+              <div className="text-xs font-medium text-[#627D98] mt-0.5">Daily Punches</div>
             </div>
             <div className="w-px h-10 bg-slate-200" />
             <div>
-              <div className="text-2xl sm:text-3xl font-black text-[#008C75]">99.99%</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">System Reliability</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#00A8A8]">99.4%</div>
+              <div className="text-xs font-medium text-[#627D98] mt-0.5">AI Matching Accuracy</div>
             </div>
             <div className="w-px h-10 bg-slate-200" />
             <div>
-              <div className="text-2xl sm:text-3xl font-black text-[#FF5A36]">0</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Raw Photos Saved</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#002D62]">₹0</div>
+              <div className="text-xs font-medium text-[#627D98] mt-0.5">Proprietary Hardware Cost</div>
             </div>
           </div>
         </div>
 
         {/* Brand Showcase Visual */}
         <div className="lg:col-span-5 flex justify-center">
-          <div className="w-full max-w-md bg-[#FDFBF7] rounded-3xl p-6 sm:p-8 border-2 border-slate-900 shadow-[6px_6px_0_0_#0F172A] space-y-6">
+          <div className="w-full max-w-md bg-[#F8FAFC] rounded-2xl p-6 sm:p-8 border border-slate-200 space-y-6">
             <div className="flex items-center gap-3">
               <img src="/hrduo_logo.png" alt="HRDuo" className="h-10 w-auto" />
             </div>
-            <blockquote className="text-slate-800 text-base sm:text-lg font-bold italic leading-snug">
-              "Your People. Our Priority. Every single line of code we write is dedicated to making work life frictionless."
+            <blockquote className="text-[#002D62] text-base sm:text-lg font-semibold leading-relaxed">
+              "Smart HR. Stronger Together. Every feature we build is engineered to give hours back to your HR teams and employees."
             </blockquote>
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-xs">
               <div>
-                <div className="font-extrabold text-slate-900 text-sm">Engineering & AI Team</div>
-                <div className="text-xs text-slate-500">HRDuo Technologies</div>
+                <div className="font-bold text-[#002D62]">Engineering & Product Team</div>
+                <div className="text-[#627D98]">Autonomous Workforce Solutions</div>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200 text-xs font-bold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#E6F8F8] text-[#008585] rounded-full font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00A8A8] animate-pulse" />
                 <span>Verified</span>
               </div>
             </div>
@@ -157,13 +159,15 @@ export default function AboutPage() {
 
       {/* 3. Core Company Values */}
       <div className="space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <Badge variant="teal">What Drives Us</Badge>
-          <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-            Our Core Operating Principles
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#00A8A8]">
+            Core Principles
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002D62]">
+            What Drives Our Platform
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base font-medium">
-            These values guide our product roadmap, engineering decisions, and customer relationships every day.
+          <p className="text-[#334E68] text-sm">
+            These values guide our product roadmap, engineering decisions, and client relationships every day.
           </p>
         </div>
 
@@ -173,15 +177,15 @@ export default function AboutPage() {
             return (
               <div 
                 key={idx} 
-                className="bg-white rounded-3xl p-6 sm:p-8 border border-[#F1E8D9] shadow-sm hover:shadow-md transition-shadow space-y-4"
+                className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs hover:shadow-xs transition-all space-y-3"
               >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${v.color}`}>
-                  <Icon className="w-6 h-6" />
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${v.color}`}>
+                  <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="font-black text-slate-900 text-lg sm:text-xl">
+                <h3 className="font-bold text-[#002D62] text-base sm:text-lg">
                   {v.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                <p className="text-xs sm:text-sm text-[#334E68] leading-relaxed font-normal">
                   {v.desc}
                 </p>
               </div>
@@ -191,29 +195,31 @@ export default function AboutPage() {
       </div>
 
       {/* 4. Journey & Milestones Timeline */}
-      <div className="bg-white rounded-3xl sm:rounded-[2.5rem] border border-[#F1E8D9] p-8 sm:p-12 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-          <Badge variant="yellow">The Journey</Badge>
-          <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-            How We Got Here
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-12 shadow-sm">
+        <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#00A8A8]">
+            Milestones
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002D62]">
+            Our Continuous Evolution
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base font-medium">
-            A relentless commitment to simplifying human resource workflows.
+          <p className="text-[#334E68] text-sm">
+            A commitment to continuous product improvement for modern businesses.
           </p>
         </div>
 
-        <div className="relative border-l-2 border-slate-200 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-10">
+        <div className="relative border-l-2 border-slate-200 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-8">
           {milestones.map((m, idx) => (
             <div key={idx} className="relative group">
-              <div className="absolute -left-[35px] sm:-left-[51px] top-1 w-6 h-6 rounded-full bg-white border-4 border-slate-900 group-hover:border-[#FFC933] transition-colors" />
+              <div className="absolute -left-[33px] sm:-left-[49px] top-1 w-5 h-5 rounded-full bg-white border-4 border-[#002D62] group-hover:border-[#00A8A8] transition-colors" />
               <div className="space-y-1">
-                <span className="text-xs font-black text-[#008C75] uppercase tracking-wider">
+                <span className="text-xs font-bold text-[#00A8A8] uppercase tracking-wider">
                   {m.year}
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                <h3 className="text-lg sm:text-xl font-bold text-[#002D62]">
                   {m.title}
                 </h3>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium max-w-3xl">
+                <p className="text-[#334E68] text-xs sm:text-sm leading-relaxed max-w-3xl">
                   {m.desc}
                 </p>
               </div>
@@ -222,66 +228,29 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* 5. Trust & Certifications Bento */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#E6F7F5] rounded-3xl p-6 sm:p-8 border border-[#BCECE5] space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-[#008C75] text-white flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-slate-900 text-lg">SOC 2 Type II Compliant</h3>
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-            Independently audited operational procedures, biometric access controls, and data segregation policies.
-          </p>
-        </div>
-
-        <div className="bg-[#FEF3C7] rounded-3xl p-6 sm:p-8 border border-[#FDE68A] space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center">
-            <Globe2 className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-slate-900 text-lg">GDPR & DPDP Ready</h3>
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-            Strict adherence to global biometric privacy laws with employee consent workflows and irreversible vectors.
-          </p>
-        </div>
-
-        <div className="bg-[#F3E8FF] rounded-3xl p-6 sm:p-8 border border-[#E9D5FF] space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center">
-            <Award className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-slate-900 text-lg">99.99% Guaranteed SLA</h3>
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-            Edge offline-buffering guarantees that even during internet outages, attendance never misses a beat.
-          </p>
-        </div>
-      </div>
-
-      {/* 6. Bottom Call to Action */}
-      <div className="bg-slate-950 text-white rounded-3xl sm:rounded-[2.5rem] p-8 sm:p-12 text-center relative overflow-hidden">
-        <div className="max-w-2xl mx-auto space-y-4 relative z-10">
-          <h2 className="text-3xl sm:text-4xl font-black">
-            Join the Hundreds of Teams Empowered by HRDuo
+      {/* 5. Bottom Call to Action */}
+      <div className="bg-[#EBF3FA] rounded-3xl p-8 sm:p-12 border border-[#D9E2EC] text-center">
+        <div className="max-w-2xl mx-auto space-y-4">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002D62]">
+            Ready to Experience Smart Attendance?
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base font-medium">
+          <p className="text-[#334E68] text-sm sm:text-base">
             Whether you manage 10 employees or 10,000, our team is excited to help you streamline your workplace.
           </p>
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-            <Button
-              variant="primary"
-              size="lg"
+          <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
+            <button
               onClick={() => navigate('/face-attendance')}
-              className="flex items-center gap-2"
+              className="bg-gradient-to-r from-[#002D62] to-[#004B8D] hover:from-[#001E42] hover:to-[#003B73] text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-md cursor-pointer"
             >
               <span>Try Face Kiosk Now</span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
+              <ArrowRight className="w-4 h-4 text-[#00C9CE]" />
+            </button>
+            <button
               onClick={() => navigate('/contact')}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="bg-white hover:bg-slate-50 text-[#002D62] border border-slate-200 px-6 py-3 rounded-xl font-semibold text-sm cursor-pointer"
             >
-              Speak with Our Team
-            </Button>
+              Schedule Consultation
+            </button>
           </div>
         </div>
       </div>
