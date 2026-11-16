@@ -105,8 +105,8 @@ export default function AdminDashboard() {
 
         <div className="flex items-center gap-3">
           <Link
-            to="/admin/employees"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md shadow-blue-500/20 transition-all"
+            to="/admin/employees?action=add"
+            className="inline-flex items-center gap-2 bg-[#002D62] hover:bg-[#001D42] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md shadow-[#002D62]/20 transition-all"
           >
             <Plus size={14} />
             <span>Add Employee</span>

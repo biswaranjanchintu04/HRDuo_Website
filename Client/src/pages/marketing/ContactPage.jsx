@@ -182,10 +182,10 @@ export default function ContactPage() {
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#002D62] focus:ring-2 focus:ring-blue-100 focus:outline-none text-sm text-[#002D62] bg-white transition-all cursor-pointer"
                     >
                       <option value="all-in-one">Complete Suite (Face Attendance + Payroll)</option>
+                      <option value="corporate-office">Corporate Office Workforce Suite</option>
+                      <option value="small-warehouse">Small Warehouse & Dispatch Suite</option>
                       <option value="face-attendance">AI Face Biometrics & Touchless Kiosks</option>
                       <option value="geofence">GPS Geofencing Mobile Attendance</option>
-                      <option value="gym-suite">Gym & Fitness Member Turnstile Suite</option>
-                      <option value="campus-suite">Education & Campus Kiosks</option>
                       <option value="enterprise-custom">Enterprise Custom API Integration</option>
                     </select>
                   </div>

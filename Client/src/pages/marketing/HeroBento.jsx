@@ -1,13 +1,97 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  ArrowRight, ShieldCheck, MapPin, Sparkles, CheckCircle2, 
-  Smartphone, Users, Clock, Zap, Building2, Play
+  ArrowRight, CheckCircle2, Building2, Play, Pause, Warehouse,
+  Volume2, VolumeX, Maximize2, RotateCcw
 } from 'lucide-react';
 
 export function HeroBento() {
   const navigate = useNavigate();
+
+  // Video State for HRDuo Promo
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(20);
+
+  const handleStartPlay = () => {
+    setHasStarted(true);
+    setIsPlaying(true);
+    setIsMuted(false);
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      videoRef.current.play().catch(() => {
+        // Fallback if browser requires mute for initial play
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          setIsMuted(true);
+          videoRef.current.play();
+        }
+      });
+    }
+  };
+
+  const togglePlay = () => {
+    if (!hasStarted) {
+      handleStartPlay();
+      return;
+    }
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const toggleMute = (e) => {
+    e?.stopPropagation();
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+      if (videoRef.current.duration && !isNaN(videoRef.current.duration)) {
+        setDuration(videoRef.current.duration);
+      }
+    }
+  };
+
+  const handleSeek = (e) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    if (videoRef.current && duration) {
+      videoRef.current.currentTime = Math.max(0, Math.min(pos * duration, duration));
+    }
+  };
+
+  const handleFullscreen = (e) => {
+    e?.stopPropagation();
+    if (videoRef.current) {
+      if (videoRef.current.requestFullscreen) {
+        videoRef.current.requestFullscreen();
+      } else if (videoRef.current.webkitRequestFullscreen) {
+        videoRef.current.webkitRequestFullscreen();
+      }
+    }
+  };
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   return (
     <section className="relative pt-6 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
@@ -49,34 +133,31 @@ export function HeroBento() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-base sm:text-xl text-[#334E68] font-normal max-w-2xl mx-auto leading-relaxed pt-5 sm:pt-6"
+          className="mt-6 text-base sm:text-lg text-[#334E68] max-w-2xl leading-relaxed font-normal"
         >
           One platform for every workforce. Powerful, industry-ready solutions to manage people, operations, shifts, and compliance with simplicity.
         </motion.p>
 
-        {/* Action Buttons Row */}
+        {/* Primary CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-8 w-full sm:w-auto"
+          className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto"
         >
-          {/* Primary CTA: Schedule Demo in HRDuo Navy to Teal Gradient */}
           <button
             onClick={() => navigate('/contact')}
-            className="w-full sm:w-auto bg-gradient-to-r from-[#002D62] to-[#004B8D] hover:from-[#001E42] hover:to-[#003B73] text-white px-7 py-3.5 rounded-xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-blue-950/20 hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#002D62] hover:bg-[#001D42] text-white px-7 py-3.5 rounded-full font-bold text-sm shadow-md shadow-[#002D62]/20 hover:shadow-lg hover:shadow-[#002D62]/30 transition-all cursor-pointer"
           >
-            <span>Schedule Demo</span>
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#00C9CE]" />
+            <span>Book a Live Demo</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
 
-          {/* Secondary CTA: Explore Platform */}
           <button
             onClick={() => navigate('/solutions')}
-            className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#002D62] border border-[#D9E2EC] px-6 py-3.5 rounded-xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 shadow-xs hover:border-[#002D62]/40 transition-all cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#002D62] border border-slate-200 px-6 py-3.5 rounded-full font-bold text-sm shadow-2xs hover:shadow-xs transition-all cursor-pointer"
           >
-            <Play className="w-4 h-4 text-[#00A8A8] fill-[#00A8A8]" />
-            <span>Explore Platform</span>
+            <span>Explore Solutions</span>
           </button>
         </motion.div>
 
@@ -103,251 +184,241 @@ export function HeroBento() {
 
       </div>
 
-      {/* Hero Interactive Telemetry Preview Card */}
+      {/* Hero Video Showcase Card: Clean Frame with Custom Thumbnail (Top Mock Bar Removed) */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.35 }}
         className="mt-12 sm:mt-16 max-w-5xl mx-auto"
       >
-        <div className="relative rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-gradient-to-b from-[#002D62]/15 via-slate-100/50 to-slate-200/40 border border-[#D9E2EC] shadow-2xl backdrop-blur-md">
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 overflow-hidden shadow-inner">
-            
-            {/* Top Mock Window Bar */}
-            <div className="px-4 py-3 bg-[#F8FAFC] border-b border-slate-100 flex items-center justify-between text-xs text-[#627D98]">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-400/80" />
-                <span className="w-3 h-3 rounded-full bg-amber-400/80" />
-                <span className="w-3 h-3 rounded-full bg-emerald-400/80" />
-                <span className="ml-2 font-mono text-[11px] text-[#627D98]">hrduo.com/live-control-center</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E6F8F8] text-[#008585] font-semibold text-[11px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00A8A8] animate-ping" />
-                  Live Sync Active
-                </span>
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-200/90 bg-slate-950 aspect-video group">
+          {/* Native Video Element */}
+          <video
+            ref={videoRef}
+            src="/HRDuo_Promo_20s_audio.mp4"
+            poster="/hrduo_video_thumbnail.jpg"
+            loop
+            muted={isMuted}
+            playsInline
+            onTimeUpdate={handleTimeUpdate}
+            onClick={togglePlay}
+            className="w-full h-full object-cover cursor-pointer"
+          />
+
+          {/* ── THUMBNAIL OVERLAY (Shown before playback starts) ── */}
+          {!hasStarted && (
+            <div 
+              onClick={handleStartPlay}
+              className="absolute inset-0 z-20 cursor-pointer group/thumb flex items-center justify-center"
+            >
+              {/* Thumbnail Image */}
+              <img 
+                src="/hrduo_video_thumbnail.jpg" 
+                alt="HRDuo - Manage People. Simplify Work." 
+                className="w-full h-full object-cover"
+              />
+
+              {/* Gentle Vignette Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+
+              {/* Big Animated Center Play Button */}
+              <div className="relative z-10 flex flex-col items-center gap-3">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#00A8A8] hover:bg-[#008f8f] text-white flex items-center justify-center shadow-[0_0_50px_rgba(0,168,168,0.7)] group-hover/thumb:scale-110 transition-all duration-300">
+                  <Play size={36} className="ml-1 text-white fill-white" />
+                </div>
+                <div className="bg-slate-950/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-white text-xs font-bold shadow-lg flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Watch Overview (20s) · Click to Play</span>
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Dashboard Content Grid */}
-            <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-[#FAFCFF]">
-              
-              {/* Left Column: Live Geo-Fencing & Biometric Kiosk Status */}
-              <div className="lg:col-span-7 space-y-4">
-                <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-xs">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#627D98]">Smart Punch Terminal</span>
-                      <h4 className="text-base font-bold text-[#002D62]">Touchless AI Kiosk & GPS Geofence</h4>
+          {/* ── ACTIVE VIDEO CONTROLS & OVERLAYS (When started) ── */}
+          {hasStarted && (
+            <>
+              {/* Big Center Play/Pause Overlay Indicator when paused or hovered */}
+              <div 
+                onClick={togglePlay}
+                className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-200 cursor-pointer ${
+                  !isPlaying ? 'opacity-100 bg-black/40' : 'opacity-0 group-hover:opacity-100 bg-black/10'
+                }`}
+              >
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#002D62]/90 hover:bg-[#002D62] text-white flex items-center justify-center shadow-2xl backdrop-blur-md transform transition-transform group-hover:scale-105 border border-white/20">
+                  {isPlaying ? <Pause size={28} /> : <Play size={28} className="ml-1 text-teal-300 fill-teal-300" />}
+                </div>
+              </div>
+
+              {/* Top Video Overlay Bar */}
+              <div className="absolute top-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent flex items-center justify-between z-10 pointer-events-none">
+                <div className="flex items-center gap-2 pointer-events-auto">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 font-extrabold text-[10px] sm:text-xs border border-rose-500/40 backdrop-blur-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                    LIVE PRODUCT SHOWCASE
+                  </span>
+                  <span className="font-mono text-xs text-white/90 font-bold hidden sm:inline">
+                    HRDuo Platform Overview (20s)
+                  </span>
+                </div>
+
+                {/* Sound Indicator Toggle Button */}
+                <div className="flex items-center gap-2 pointer-events-auto">
+                  <button
+                    onClick={toggleMute}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer backdrop-blur-md shadow-md ${
+                      isMuted 
+                        ? 'bg-amber-400 hover:bg-amber-300 text-slate-950' 
+                        : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+                    }`}
+                  >
+                    {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} className="text-teal-300" />}
+                    <span>{isMuted ? 'Muted' : 'Audio On'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Bottom Video Controls Floating Scrubber Bar */}
+              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white z-10 opacity-95 group-hover:opacity-100 transition-opacity">
+                {/* Timeline Scrubber */}
+                <div 
+                  onClick={handleSeek}
+                  className="w-full h-1.5 hover:h-2.5 bg-white/20 hover:bg-white/30 rounded-full mb-3 cursor-pointer relative transition-all"
+                >
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#00A8A8] to-teal-300 rounded-full relative"
+                    style={{ width: `${(currentTime / (duration || 20)) * 100}%` }}
+                  >
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-md" />
+                  </div>
+                </div>
+
+                {/* Controls Row */}
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={togglePlay}
+                      className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                      title={isPlaying ? "Pause" : "Play"}
+                    >
+                      {isPlaying ? <Pause size={15} /> : <Play size={15} />}
+                    </button>
+
+                    <button
+                      onClick={toggleMute}
+                      className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                      title={isMuted ? "Unmute" : "Mute"}
+                    >
+                      {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                    </button>
+
+                    <div className="font-mono text-[11px] text-slate-300">
+                      {formatTime(currentTime)} / {formatTime(duration)}
                     </div>
-                    <span className="px-2.5 py-1 rounded-lg bg-[#EBF3FA] text-[#002D62] text-xs font-semibold">
-                      HQ Geofence: 75m Radius
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] text-teal-300 font-semibold hidden sm:inline">
+                      Smart Touchless Biometrics & Live Payroll
                     </span>
-                  </div>
 
-                  {/* Punch Kiosk Simulator Preview */}
-                  <div className="rounded-xl bg-gradient-to-br from-[#001E42] to-[#002D62] p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#002D62] to-[#00A8A8] flex items-center justify-center shadow-lg shadow-teal-500/20">
-                        <Smartphone className="w-7 h-7 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-slate-300">Biometric Recognition</div>
-                        <div className="text-lg font-bold text-white flex items-center gap-1.5">
-                          <span>Sophia Anderson</span>
-                          <CheckCircle2 className="w-4 h-4 text-[#00C9CE]" />
-                        </div>
-                        <div className="text-[11px] text-slate-400">Senior Full Stack Engineer • 09:00 AM</div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="px-2.5 py-1 rounded-full bg-[#00A8A8]/20 text-[#00C9CE] text-xs font-semibold border border-[#00A8A8]/30">
-                        ✓ In-Radius & Anti-Spoof Passed
-                      </span>
-                      <span className="text-[11px] text-slate-300 font-mono">Punched in 0.42s</span>
-                    </div>
-                  </div>
-
-                  {/* Mini Geofence Status Map preview */}
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="bg-[#F8FAFC] p-2.5 rounded-lg border border-slate-100">
-                      <div className="text-[#627D98] text-[10px] font-bold">PUNCH ACCURACY</div>
-                      <div className="text-[#002D62] font-bold text-sm">99.4%</div>
-                    </div>
-                    <div className="bg-[#F8FAFC] p-2.5 rounded-lg border border-slate-100">
-                      <div className="text-[#627D98] text-[10px] font-bold">AVG MATCH TIME</div>
-                      <div className="text-[#00A8A8] font-bold text-sm">&lt;1 Second</div>
-                    </div>
-                    <div className="bg-[#F8FAFC] p-2.5 rounded-lg border border-slate-100">
-                      <div className="text-[#627D98] text-[10px] font-bold">GEOFENCE BREACHES</div>
-                      <div className="text-[#00A8A8] font-bold text-sm">0 Proxy</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Live Activity Feed */}
-                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-xs">
-                  <div className="flex items-center justify-between text-xs font-semibold text-[#334E68] mb-3">
-                    <span>Recent Real-time Punches</span>
-                    <span className="text-[#00A8A8] font-semibold">Auto-refreshing</span>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { name: 'Biswaranjan Das', role: 'Lead Architect', time: '09:01 AM', status: 'On Time (Geofence)', color: 'teal' },
-                      { name: 'Aarav Sharma', role: 'Sales Executive', time: '09:14 AM', status: 'Field Punch (GPS)', color: 'navy' },
-                      { name: 'Priya Nair', role: 'UX Designer', time: '09:20 AM', status: 'WFH Verified', color: 'indigo' },
-                    ].map((row, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-slate-50/80 text-xs">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#EBF3FA] text-[#002D62] font-bold flex items-center justify-center text-[10px]">
-                            {row.name.charAt(0)}
-                          </div>
-                          <div>
-                            <span className="font-semibold text-[#002D62]">{row.name}</span>
-                            <span className="text-[#627D98] text-[11px] ml-1.5 hidden sm:inline">({row.role})</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-[#627D98] font-mono text-[11px]">{row.time}</span>
-                          <span className="px-2 py-0.5 rounded-md bg-[#E6F8F8] text-[#008585] font-semibold text-[11px]">
-                            {row.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                    <button
+                      onClick={handleFullscreen}
+                      className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                      title="Fullscreen"
+                    >
+                      <Maximize2 size={15} />
+                    </button>
                   </div>
                 </div>
               </div>
-
-              {/* Right Column: Attendance-Linked Payroll & 2-Step Leaves */}
-              <div className="lg:col-span-5 space-y-4">
-                
-                {/* Auto Payroll Sync Card */}
-                <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-xs">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#627D98]">Automated Payroll</span>
-                    <span className="text-xs font-semibold text-[#008585] bg-[#E6F8F8] px-2 py-0.5 rounded">100% Synced</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-[#002D62] mb-1">Attendance-Linked Salary Run</h4>
-                  <p className="text-xs text-[#486581] mb-4">Zero manual spreadsheet calculations. Overtime & leaves auto-computed.</p>
-
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
-                    <div className="flex justify-between text-[#334E68]">
-                      <span>Total Active Employees</span>
-                      <span className="font-bold text-[#002D62]">142</span>
-                    </div>
-                    <div className="flex justify-between text-[#334E68]">
-                      <span>Present Days Tracked</span>
-                      <span className="font-bold text-[#00A8A8]">3,124 Days</span>
-                    </div>
-                    <div className="flex justify-between text-[#334E68]">
-                      <span>Approved Paid Leaves</span>
-                      <span className="font-bold text-[#002D62]">46 Days</span>
-                    </div>
-                    <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-[#002D62]">
-                      <span>Payroll Disbursement</span>
-                      <span className="text-[#00A8A8]">Ready to Generate</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2-Step Approval Status */}
-                <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-xs">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#627D98]">Leave Workflow</span>
-                    <span className="text-xs text-[#00A8A8] font-semibold">Step 2 of 2</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-[#002D62] mb-2">2-Step Manager → HR Approval</h4>
-                  
-                  <div className="flex items-center gap-2 text-xs pt-1">
-                    <div className="flex-1 p-2 rounded-lg bg-[#E6F8F8] border border-[#D0EFEF] text-center">
-                      <div className="font-bold text-[#008585]">1. Manager</div>
-                      <div className="text-[10px] text-[#008585]">✓ Approved</div>
-                    </div>
-                    <div className="text-slate-300">→</div>
-                    <div className="flex-1 p-2 rounded-lg bg-[#EBF3FA] border border-[#D9E2EC] text-center">
-                      <div className="font-bold text-[#002D62]">2. HR Admin</div>
-                      <div className="text-[10px] text-[#002D62]">Pending Sync</div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
+            </>
+          )}
         </div>
       </motion.div>
 
-      {/* 4 Industry Suites Strip */}
+      {/* Industry Suites Strip: Corporate Office & Small Warehouse */}
       <div className="mt-16 sm:mt-24">
         <div className="text-center mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-[#002D62] bg-[#EBF3FA] px-3.5 py-1 rounded-full border border-[#D9E2EC]">
             Tailored Industry Suites
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-[#002D62] mt-3">
-            Built for Every Working Environment
+            Built Exclusively for Your Workplace
           </h2>
           <p className="text-sm sm:text-base text-[#486581] max-w-xl mx-auto mt-2">
-            Whether you operate an enterprise office, a busy fitness center, a multi-campus university, or a 24/7 clinic.
+            Purpose-built workforce management systems tailored specifically for modern corporate offices and fast-paced small warehouses.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {[
             {
-              suite: "Corporate & Enterprise",
-              desc: "Multi-branch geofencing, shift roster management, and integrated payroll control.",
-              badge: "Enterprise Ready",
+              suite: "Corporate Office",
+              desc: "Engineered for headquarters and multi-branch enterprises. Streamline hybrid scheduling, desk allocation, mobile GPS clock-ins, statutory leave compliance, and multi-tier payroll.",
+              badge: "Headquarters & Branch Offices",
               icon: Building2,
               color: "text-[#002D62]",
               bg: "bg-[#EBF3FA]",
+              features: [
+                "Geofenced mobile check-in with GPS & office WiFi verification",
+                "Automated leave quotas, multi-level manager approvals & holidays",
+                "Single-click monthly payroll ledger & direct deposit integration"
+              ]
             },
             {
-              suite: "Gym & Fitness Suite",
-              desc: "Member turnstile integrations, trainer check-ins, and flexible hourly session logs.",
-              badge: "Turnstile Ready",
-              icon: Zap,
+              suite: "Small Warehouse",
+              desc: "Built for storage facilities, dispatch bays, and distribution points. Prevent buddy-punching with touchless facial recognition kiosks, track multi-shift rotations, and manage overtime.",
+              badge: "Logistics & Fulfillment Bays",
+              icon: Warehouse,
               color: "text-[#00A8A8]",
               bg: "bg-[#E6F8F8]",
-            },
-            {
-              suite: "Education & Campuses",
-              desc: "Faculty facial kiosk, student attendance, RFID cards, and instant SMS parent alerts.",
-              badge: "Campus Kiosk",
-              icon: Users,
-              color: "text-[#002D62]",
-              bg: "bg-[#EBF3FA]",
-            },
-            {
-              suite: "Healthcare Clinics",
-              desc: "24/7 rotating nurse shifts, doctor on-call logs, and stringent compliance audits.",
-              badge: "24/7 Shifts",
-              icon: Clock,
-              color: "text-[#00A8A8]",
-              bg: "bg-[#E6F8F8]",
+              features: [
+                "High-speed AI facial recognition kiosk (works offline in loading bays)",
+                "Day/night rotating shift scheduling with automated overtime calculation",
+                "Break monitoring, shift handover tracking & real-time floor attendance"
+              ]
             },
           ].map((item, idx) => {
             const Icon = item.icon;
             return (
               <div 
                 key={idx}
-                className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#00A8A8]/40 transition-all group"
+                className="bg-white rounded-3xl p-7 border border-slate-200/90 shadow-sm hover:shadow-lg hover:border-[#00A8A8]/40 transition-all flex flex-col justify-between group"
               >
-                <div className={`w-12 h-12 rounded-xl ${item.bg} flex items-center justify-center ${item.color} mb-4 group-hover:scale-105 transition-transform`}>
-                  <Icon className="w-6 h-6" />
+                <div>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center ${item.color} group-hover:scale-105 transition-transform shadow-2xs`}>
+                      <Icon className="w-7 h-7" />
+                    </div>
+                    <span className="text-[11px] font-bold text-[#627D98] bg-slate-50 px-3 py-1 rounded-full border border-slate-200 uppercase tracking-wider">
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-black text-[#002D62] mb-2.5">
+                    {item.suite}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#486581] leading-relaxed font-normal mb-5">
+                    {item.desc}
+                  </p>
+
+                  <div className="space-y-2.5 pt-4 border-t border-slate-100 mb-6">
+                    {item.features.map((feat, fIdx) => (
+                      <div key={fIdx} className="flex items-start gap-2.5 text-xs text-slate-700 font-medium">
+                        <CheckCircle2 size={15} className="text-[#00A8A8] shrink-0 mt-0.5" />
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <span className="text-[11px] font-bold text-[#627D98] uppercase tracking-wider block mb-1">
-                  {item.badge}
-                </span>
-                <h3 className="text-base font-bold text-[#002D62] mb-2">
-                  {item.suite}
-                </h3>
-                <p className="text-xs sm:text-sm text-[#486581] leading-relaxed font-normal">
-                  {item.desc}
-                </p>
+
+                <button
+                  onClick={() => navigate('/solutions')}
+                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-200 hover:border-[#002D62] text-xs font-bold text-[#002D62] hover:bg-[#EBF3FA] transition-colors cursor-pointer"
+                >
+                  <span>Explore {item.suite} Suite</span>
+                  <ArrowRight size={13} />
+                </button>
               </div>
             );
           })}

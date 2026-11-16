@@ -92,7 +92,7 @@ export default function HRDashboard() {
         <div className="flex items-center gap-2">
           <Link
             to="/hr/add-employee"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md shadow-blue-500/20 transition-all"
+            className="inline-flex items-center gap-2 bg-[#002D62] hover:bg-[#001D42] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md shadow-[#002D62]/20 transition-all"
           >
             <UserPlus size={14} />
             <span>Add Employee</span>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Wallet, Download, CheckCircle2, ArrowDownRight, ArrowUpRight,
   FileText, Clock, Send, X, Info, Bell
@@ -343,16 +344,16 @@ export default function EmployeeSalary() {
       </div>
 
       {/* ── Request Modal ── */}
-      {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {modal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md"
             onClick={closeModal}
           />
 
           {/* Dialog */}
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 animate-fade-in">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 animate-fade-in z-10">
             {/* Close button */}
             <button
               onClick={closeModal}
@@ -398,14 +399,14 @@ export default function EmployeeSalary() {
               <button
                 onClick={closeModal}
                 disabled={submitting}
-                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmRequest}
                 disabled={submitting}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-70 cursor-pointer"
               >
                 {submitting ? (
                   <>
@@ -424,7 +425,8 @@ export default function EmployeeSalary() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

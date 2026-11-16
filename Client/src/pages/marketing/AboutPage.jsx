@@ -69,8 +69,8 @@ export default function AboutPage() {
     },
     {
       year: "2026",
-      title: "Multi-Industry Suite Expansion",
-      desc: "Powering thousands of daily check-ins across Corporate Enterprises, Gym & Fitness Centers, Education Campuses, and Healthcare Organizations."
+      title: "Specialized Industry Suite Launch",
+      desc: "Powering thousands of daily check-ins across Corporate Offices and fast-paced Small Warehouses with tailored geofencing and touchless kiosk solutions."
     }
   ];
 

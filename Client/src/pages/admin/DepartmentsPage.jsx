@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Layers, Plus, Users, DollarSign, Briefcase, MapPin, X, Check } from 'lucide-react';
 import { useHRMS } from '../../context/HRMSContext';
 import { useAlert } from '../../context/AlertContext';
@@ -89,11 +90,31 @@ export default function DepartmentsPage() {
         ))}
       </div>
 
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-slate-200">
-            <h3 className="text-base font-black text-slate-900 mb-1">Create New Department</h3>
-            <p className="text-xs text-slate-500 mb-4">Define a new operational vertical</p>
+      {showAddModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans">
+          {/* Full website background blur */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => setShowAddModal(false)}
+          />
+
+          <div 
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-slate-200/80 my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div>
+                <h3 className="text-base font-black text-[#002D62]">Create New Department</h3>
+                <p className="text-xs text-slate-500">Define a new operational vertical</p>
+              </div>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Department Name *</label>
@@ -103,7 +124,7 @@ export default function DepartmentsPage() {
                   placeholder="e.g. Artificial Intelligence"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00A8A8] focus:border-[#00A8A8]"
                 />
               </div>
               <div>
@@ -113,7 +134,7 @@ export default function DepartmentsPage() {
                   placeholder="Dr. Gregory House"
                   value={formData.head}
                   onChange={e => setFormData({ ...formData, head: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                 />
               </div>
               <div>
@@ -122,27 +143,28 @@ export default function DepartmentsPage() {
                   type="text"
                   value={formData.budget}
                   onChange={e => setFormData({ ...formData, budget: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                 />
               </div>
               <div className="pt-3 flex gap-2">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-xl bg-blue-600 text-white font-bold shadow-md shadow-blue-500/20"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001D42] text-white font-bold shadow-md shadow-[#002D62]/20 transition-all cursor-pointer"
                 >
                   Create
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

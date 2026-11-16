@@ -1,7 +1,9 @@
-import React from 'react';
-import { Users, Mail, Phone, Star, CheckCircle2, Clock, XCircle, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Users, Mail, Phone, Star, CheckCircle2, Clock, XCircle, MessageSquare, Plus, X } from 'lucide-react';
+import { useAlert } from '../../context/AlertContext';
 
-const team = [
+const initialTeam = [
   { name: 'Sarah Jenkins', role: 'Senior Developer', email: 'sarah@hrduo.com', phone: '+1 555-0101', status: 'Present', tasks: 3, rating: 4.8, avatar: 'SJ', color: 'bg-violet-600' },
   { name: 'Linda Cho', role: 'UX Designer', email: 'linda@hrduo.com', phone: '+1 555-0107', status: 'Present', tasks: 2, rating: 4.6, avatar: 'LC', color: 'bg-pink-600' },
   { name: 'Raj Mehta', role: 'Backend Engineer', email: 'raj@hrduo.com', phone: '+1 555-0108', status: 'On Leave', tasks: 0, rating: 4.5, avatar: 'RM', color: 'bg-blue-600' },
@@ -18,20 +20,76 @@ const statusConfig = {
 };
 
 export default function TeamPage() {
+  const { showToast } = useAlert();
+  const [team, setTeam] = useState(initialTeam);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    role: '',
+    email: '',
+    phone: '',
+    status: 'Present'
+  });
+
+  useEffect(() => {
+    if (showAddModal) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') setShowAddModal(false);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [showAddModal]);
+
+  const handleAddMember = (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.role) {
+      showToast('Please fill out all required fields', 'error');
+      return;
+    }
+    const initials = formData.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'EM';
+    const newMember = {
+      ...formData,
+      tasks: 0,
+      rating: 5.0,
+      avatar: initials,
+      color: 'bg-[#002D62]'
+    };
+    setTeam([newMember, ...team]);
+    showToast(`Added ${formData.name} to team roster!`, 'success');
+    setShowAddModal(false);
+    setFormData({ name: '', role: '', email: '', phone: '', status: 'Present' });
+  };
+
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
-            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 shrink-0" />
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#002D62] shrink-0" />
             My Team
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Engineering Department · {team.length} direct reports</p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200 rounded-xl px-3 py-2 w-fit">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-semibold">{team.filter(t => t.status === 'Present').length} / {team.length} Present</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200 rounded-xl px-3 py-2 w-fit">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold">{team.filter(t => t.status === 'Present').length} / {team.length} Present</span>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center gap-1.5 bg-[#002D62] hover:bg-[#001D42] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition-all cursor-pointer"
+          >
+            <Plus size={15} />
+            <span>Add Member</span>
+          </button>
         </div>
       </div>
 
@@ -113,6 +171,116 @@ export default function TeamPage() {
           );
         })}
       </div>
+
+      {/* Add Team Member Modal - Portaled to document.body for full website blur */}
+      {showAddModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans">
+          {/* Full website background blur */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => setShowAddModal(false)}
+          />
+
+          <div 
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200/80 my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <div>
+                <h3 className="text-lg font-black text-[#002D62]">Add Team Member</h3>
+                <p className="text-xs text-slate-500">Assign a new engineer to this engineering pod</p>
+              </div>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddMember} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Alex Henderson"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A8A8] focus:border-[#00A8A8]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Role / Specialization *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Cloud Infrastructure Engineer"
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Work Email *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="alex@hrduo.com"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    placeholder="+1 555-0199"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Initial Status</label>
+                <select
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
+                >
+                  <option value="Present">Present</option>
+                  <option value="On Leave">On Leave</option>
+                  <option value="Late">Late</option>
+                  <option value="Absent">Absent</option>
+                </select>
+              </div>
+
+              <div className="pt-3 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001D42] text-white text-xs font-bold shadow-md shadow-[#002D62]/20 transition-all cursor-pointer"
+                >
+                  Add to Pod
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

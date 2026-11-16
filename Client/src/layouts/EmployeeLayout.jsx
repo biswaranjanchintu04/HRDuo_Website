@@ -35,7 +35,7 @@ export default function EmployeeLayout() {
   };
 
   return (
-    <div className="h-screen h-[100dvh] bg-[#F4F7FE] flex overflow-hidden font-poppins relative">
+    <div className="h-screen h-[100dvh] bg-[#F4F7FE] flex overflow-hidden font-sans relative">
       {/* Decorative background accents */}
       <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[20%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
@@ -53,7 +53,7 @@ export default function EmployeeLayout() {
           isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20 ml-0'
         }`}
       >
-        <div className="shrink-0 z-40 sticky top-0">
+        <div className="shrink-0 z-40">
           <Navbar onMenuClick={toggleSidebar} />
         </div>
         {/* pb-28 on mobile ensures bottom navigation bar never covers content */}

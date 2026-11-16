@@ -78,22 +78,12 @@ export function MarketingFooter() {
             <ul className="space-y-2.5 text-xs sm:text-sm font-medium text-[#486581]">
               <li>
                 <Link to="/solutions" className="hover:text-[#002D62] transition-colors">
-                  Corporate & Enterprises
+                  Corporate Office
                 </Link>
               </li>
               <li>
                 <Link to="/solutions" className="hover:text-[#002D62] transition-colors">
-                  Gym & Fitness Suite
-                </Link>
-              </li>
-              <li>
-                <Link to="/solutions" className="hover:text-[#002D62] transition-colors">
-                  Education & Campuses
-                </Link>
-              </li>
-              <li>
-                <Link to="/solutions" className="hover:text-[#002D62] transition-colors">
-                  Healthcare Organizations
+                  Small Warehouse
                 </Link>
               </li>
             </ul>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { CalendarRange, Plus, CheckCircle2, Clock, XCircle, X, User, Building2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useHRMS } from '../../context/HRMSContext';
 import { useAlert } from '../../context/AlertContext';
@@ -391,24 +392,30 @@ export default function EmployeeLeaves() {
         )}
       </div>
 
-      {/* ── Apply Leave Modal ── */}
-      {showApplyModal && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:items-center sm:justify-center p-0 sm:p-4 bg-slate-950/40 backdrop-blur-sm">
-          {/* Tap outside to close */}
-          <div className="absolute inset-0" onClick={() => setShowApplyModal(false)} />
+      {/* ── Apply Leave Modal - Portaled to document.body for full website blur ── */}
+      {showApplyModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex flex-col justify-end sm:items-center sm:justify-center p-0 sm:p-4 overflow-y-auto font-sans">
+          {/* Full website background blur */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => setShowApplyModal(false)}
+          />
 
-          <div className="relative bg-white rounded-t-[2rem] sm:rounded-3xl p-5 sm:p-7 w-full sm:max-w-md shadow-2xl border border-slate-200 z-10 max-h-[90vh] overflow-y-auto">
+          <div 
+            className="relative z-10 bg-white rounded-t-[2rem] sm:rounded-3xl p-5 sm:p-7 w-full sm:max-w-md shadow-2xl border border-slate-200/80 max-h-[90vh] overflow-y-auto my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Handle bar — mobile only */}
             <div className="w-10 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 sm:hidden" />
 
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
               <div>
-                <h3 className="text-base font-black text-slate-900">Request Time Off</h3>
+                <h3 className="text-base font-black text-[#002D62]">Request Time Off</h3>
                 <p className="text-xs text-slate-500 mt-0.5">Routed to Manager → HR for two-step approval</p>
               </div>
               <button
                 onClick={() => setShowApplyModal(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors touch-manipulation"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors touch-manipulation cursor-pointer"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -499,14 +506,15 @@ export default function EmployeeLeaves() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm shadow-md shadow-blue-500/20 transition-colors touch-manipulation"
+                  className="flex-1 py-3 rounded-xl bg-[#002D62] hover:bg-[#001D42] text-white font-bold text-sm shadow-md shadow-[#002D62]/20 transition-all touch-manipulation cursor-pointer"
                 >
                   Submit Request
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

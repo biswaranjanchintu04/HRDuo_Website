@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Building2, Plus, Search, MoreHorizontal, Eye, Edit2, 
   Trash2, Filter, Globe, X, Check, ShieldCheck, Mail, Phone, MapPin 
@@ -212,18 +213,27 @@ export default function OrganizationsPage() {
         </div>
       </div>
 
-      {/* Add Company Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200">
+      {/* Add Company Modal - Portaled to document.body for full website blur */}
+      {showAddModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans">
+          {/* Full website background blur */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => setShowAddModal(false)}
+          />
+
+          <div 
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200/80 my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
               <div>
-                <h3 className="text-lg font-black text-slate-900">Provision New Organization</h3>
+                <h3 className="text-lg font-black text-[#002D62]">Provision New Organization</h3>
                 <p className="text-xs text-slate-500">Deploy dedicated tenant workspace and licenses</p>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -320,39 +330,49 @@ export default function OrganizationsPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001D42] text-white text-xs font-bold shadow-md shadow-[#002D62]/20 transition-all cursor-pointer"
                 >
                   Provision Now
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* View Company Details Modal */}
-      {selectedCompany && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200">
+      {/* View Company Details Modal - Portaled to document.body for full website blur */}
+      {selectedCompany && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans">
+          {/* Full website background blur */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => setSelectedCompany(null)}
+          />
+
+          <div 
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200/80 my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+                <div className="w-12 h-12 rounded-2xl bg-[#002D62] text-white flex items-center justify-center font-bold text-lg">
                   {selectedCompany.name.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900">{selectedCompany.name}</h3>
-                  <span className="text-xs text-blue-600 font-semibold">{selectedCompany.slug}</span>
+                  <h3 className="text-base font-black text-[#002D62]">{selectedCompany.name}</h3>
+                  <span className="text-xs text-[#00A8A8] font-semibold">{selectedCompany.slug}</span>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedCompany(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -365,7 +385,7 @@ export default function OrganizationsPage() {
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-50">
                 <span className="text-slate-400 font-medium">Active Plan:</span>
-                <span className="font-bold text-blue-600">{selectedCompany.plan} ({selectedCompany.mrr}/mo)</span>
+                <span className="font-bold text-[#00A8A8]">{selectedCompany.plan} ({selectedCompany.mrr}/mo)</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-50">
                 <span className="text-slate-400 font-medium">Seats Allocated:</span>
@@ -384,13 +404,14 @@ export default function OrganizationsPage() {
             <div className="mt-6 pt-4 border-t border-slate-100 flex gap-2">
               <button
                 onClick={() => setSelectedCompany(null)}
-                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700"
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
               >
                 Close
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

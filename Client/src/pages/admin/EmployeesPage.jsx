@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { 
   Search, Plus, Filter, MoreHorizontal, Edit2, Trash2, 
   Eye, Mail, Phone, MapPin, X, Check, Download, Users 
@@ -7,6 +9,7 @@ import { useHRMS } from '../../context/HRMSContext';
 import { useAlert } from '../../context/AlertContext';
 
 export default function EmployeesPage() {
+  const location = useLocation();
   const { employees, addEmployee, updateEmployee, deleteEmployee, departments } = useHRMS();
   const { showToast, showConfirm } = useAlert();
 
@@ -20,6 +23,36 @@ export default function EmployeesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEmp, setEditingEmp] = useState(null);
   const [viewingEmp, setViewingEmp] = useState(null);
+
+  // Auto-open modal if query params indicate action=add
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('action') === 'add' || params.get('add') === 'true' || location.state?.openAdd) {
+      handleOpenAdd();
+    }
+  }, [location.search, location.state]);
+
+  // Lock background scroll and listen for Escape key when any modal is open
+  useEffect(() => {
+    const isAnyModalOpen = showAddModal || !!editingEmp || !!viewingEmp;
+    if (isAnyModalOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          setShowAddModal(false);
+          setEditingEmp(null);
+          setViewingEmp(null);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [showAddModal, editingEmp, viewingEmp]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -119,7 +152,7 @@ export default function EmployeesPage() {
           </button>
           <button
             onClick={handleOpenAdd}
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#002D62] hover:bg-[#001D42] text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-[#002D62]/20 transition-all cursor-pointer"
           >
             <Plus size={14} />
             Add Employee
@@ -294,13 +327,23 @@ export default function EmployeesPage() {
         )}
       </div>
 
-      {/* Add / Edit Employee Modal */}
-      {(showAddModal || editingEmp) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+      {/* Add / Edit Employee Modal - Portaled to document.body for full website blur */}
+      {(showAddModal || editingEmp) && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans">
+          {/* Full-screen backdrop blur & dark tint covering the whole website */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => { setShowAddModal(false); setEditingEmp(null); }}
+          />
+
+          {/* Modal Card */}
+          <div 
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200/80 max-h-[90vh] overflow-y-auto my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
               <div>
-                <h3 className="text-lg font-black text-slate-900">
+                <h3 className="text-lg font-black text-[#002D62]">
                   {editingEmp ? `Edit: ${editingEmp.name}` : 'Add New Employee'}
                 </h3>
                 <p className="text-xs text-slate-500">
@@ -309,7 +352,7 @@ export default function EmployeesPage() {
               </div>
               <button
                 onClick={() => { setShowAddModal(false); setEditingEmp(null); }}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -324,7 +367,7 @@ export default function EmployeesPage() {
                   placeholder="e.g. Liam Gallagher"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A8A8] focus:border-[#00A8A8]"
                 />
               </div>
 
@@ -337,7 +380,7 @@ export default function EmployeesPage() {
                     placeholder="liam@hrduo.com"
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   />
                 </div>
                 <div>
@@ -347,7 +390,7 @@ export default function EmployeesPage() {
                     placeholder="+1 (555) 000-0000"
                     value={formData.phone}
                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   />
                 </div>
               </div>
@@ -358,7 +401,7 @@ export default function EmployeesPage() {
                   <select
                     value={formData.department}
                     onChange={e => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   >
                     {departments.map(d => (
                       <option key={d.id} value={d.name}>{d.name}</option>
@@ -373,7 +416,7 @@ export default function EmployeesPage() {
                     placeholder="Senior Developer"
                     value={formData.role}
                     onChange={e => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   />
                 </div>
               </div>
@@ -385,7 +428,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={formData.salary}
                     onChange={e => setFormData({ ...formData, salary: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   />
                 </div>
                 <div>
@@ -394,7 +437,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={formData.location}
                     onChange={e => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   />
                 </div>
               </div>
@@ -406,7 +449,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={formData.manager}
                     onChange={e => setFormData({ ...formData, manager: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   />
                 </div>
                 <div>
@@ -414,7 +457,7 @@ export default function EmployeesPage() {
                   <select
                     value={formData.status}
                     onChange={e => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#00A8A8]"
                   >
                     <option value="Active">Active</option>
                     <option value="On Leave">On Leave</option>
@@ -427,37 +470,47 @@ export default function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => { setShowAddModal(false); setEditingEmp(null); }}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001D42] text-white text-xs font-bold shadow-md shadow-[#002D62]/20 transition-all cursor-pointer"
                 >
                   {editingEmp ? 'Save Changes' : 'Confirm & Add'}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* View Details Drawer / Modal */}
-      {viewingEmp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200">
+      {/* View Details Drawer / Modal - Portaled to document.body for full website blur */}
+      {viewingEmp && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans">
+          {/* Full-screen backdrop blur & dark tint covering the whole website */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
+            onClick={() => setViewingEmp(null)}
+          />
+
+          <div 
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200/80 my-auto animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-3">
                 <img src={viewingEmp.avatar} alt={viewingEmp.name} className="w-12 h-12 rounded-full object-cover" />
                 <div>
-                  <h3 className="text-base font-black text-slate-900">{viewingEmp.name}</h3>
-                  <span className="text-xs text-blue-600 font-mono font-bold">{viewingEmp.empId}</span>
+                  <h3 className="text-base font-black text-[#002D62]">{viewingEmp.name}</h3>
+                  <span className="text-xs text-[#00A8A8] font-mono font-bold">{viewingEmp.empId}</span>
                 </div>
               </div>
               <button
                 onClick={() => setViewingEmp(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -501,13 +554,14 @@ export default function EmployeesPage() {
             <div className="mt-6 pt-4 border-t border-slate-100 flex gap-2">
               <button
                 onClick={() => setViewingEmp(null)}
-                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
               >
                 Close
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

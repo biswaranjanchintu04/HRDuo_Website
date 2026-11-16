@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Menu,
   Search, 
@@ -11,6 +12,7 @@ import {
   Users2, 
   Briefcase, 
   UserCheck,
+  ChevronDown,
   X
 } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -176,7 +178,7 @@ export default function Navbar({ onMenuClick }) {
   };
 
   return (
-    <header className="h-16 lg:h-20 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] flex items-center justify-between px-3.5 sm:px-6 lg:px-8 sticky top-0 z-40 shrink-0 transition-all font-poppins">
+    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-40 shrink-0 font-sans">
       {/* Left: Mobile hamburger (opens More drawer) + Mobile logo + Breadcrumbs */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Mobile: hamburger opens the More/sidebar drawer */}
@@ -190,37 +192,34 @@ export default function Navbar({ onMenuClick }) {
         </button>
 
         {/* Mobile branding */}
-        <div className="lg:hidden flex items-center gap-1.5">
-          <div className="w-7 h-7 rounded-lg bg-white p-1 shadow-sm flex items-center justify-center border border-slate-200/80">
-            <img
-              src="/favicon.png"
-              alt="HRDuo"
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<span class="text-[#0061E0] font-black text-[10px]">HR</span>';
-              }}
-            />
-          </div>
-          <span className="font-black text-sm tracking-tight text-slate-900">HRDuo</span>
+        <div className="lg:hidden flex items-center gap-2">
+          <img
+            src="/hrduo_logo.png"
+            alt="HRDuo"
+            className="h-7 w-auto object-contain"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentNode.innerHTML = '<span class="text-[#002D62] font-black text-sm">HR<span class="text-[#00A8A8]">Duo</span></span>';
+            }}
+          />
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 text-sm ml-1">
-          <span className="font-semibold text-slate-400">{activePortal.name}</span>
+        <div className="hidden sm:flex items-center gap-2 text-xs ml-1">
+          <span className="font-semibold text-slate-400 uppercase tracking-wider text-[11px]">{activePortal.name}</span>
           <span className="text-slate-300">/</span>
-          <span className="font-bold text-slate-800 tracking-tight">{pageTitle}</span>
+          <span className="font-bold text-[#002D62] text-sm tracking-tight">{pageTitle}</span>
         </div>
       </div>
 
       {/* Middle: Global Quick Search */}
-      <div className="flex-1 max-w-md mx-4 hidden md:block">
+      <div className="flex-1 max-w-md mx-6 hidden md:block">
         <div 
           onClick={() => setShowSearchModal(true)}
-          className="relative flex items-center w-full px-4 py-2 text-sm bg-white/80 hover:bg-white text-slate-500 rounded-2xl border border-slate-200/80 hover:border-[#0061E0]/50 shadow-xs hover:shadow-sm cursor-pointer transition-all group backdrop-blur-sm"
+          className="relative flex items-center w-full px-3.5 py-1.5 text-xs bg-slate-50/80 hover:bg-white text-slate-500 rounded-xl border border-slate-200 hover:border-[#00A8A8] shadow-2xs hover:shadow-xs cursor-pointer transition-all group"
         >
-          <Search className="w-4 h-4 mr-2.5 text-slate-400 group-hover:text-[#0061E0] transition-colors" />
-          <span className="text-slate-400 text-xs font-medium">Quick search employees, leaves, modules...</span>
-          <kbd className="ml-auto text-[10px] font-mono uppercase bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 text-slate-500">
+          <Search className="w-4 h-4 mr-2.5 text-slate-400 group-hover:text-[#00A8A8] transition-colors" />
+          <span className="text-slate-400 text-xs font-normal">Quick search employees, leaves, modules...</span>
+          <kbd className="ml-auto text-[10px] font-medium uppercase bg-white px-2 py-0.5 rounded-md border border-slate-200 text-slate-500 shadow-2xs">
             Ctrl+K
           </kbd>
         </div>
@@ -233,58 +232,56 @@ export default function Navbar({ onMenuClick }) {
         <div className="relative" ref={notifMenuRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className={`relative p-2.5 transition-all duration-300 rounded-2xl cursor-pointer ${
+            className={`relative p-2 transition-all duration-200 rounded-xl cursor-pointer ${
               showNotifications 
-                ? 'bg-[#0061E0] text-white shadow-lg shadow-[#0061E0]/30' 
-                : 'text-gray-500 hover:bg-slate-100'
+                ? 'bg-[#002D62] text-white shadow-md shadow-[#002D62]/20' 
+                : 'text-slate-500 hover:text-[#002D62] hover:bg-slate-100/80'
             }`}
             title="Communications"
           >
-            <Bell size={20} />
+            <Bell size={18} />
             {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-[8px] font-black border-2 border-white">
-                {unreadCount}
-              </span>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#00A8A8] rounded-full ring-2 ring-white"></span>
             )}
           </button>
 
           <AnimatePresence>
             {showNotifications && (
               <motion.div
-                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                initial={{ opacity: 0, y: 10, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                className="absolute right-0 mt-3 w-[310px] sm:w-[350px] bg-white/95 backdrop-blur-2xl border border-white/50 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden z-[100] p-2"
+                exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                className="absolute right-0 mt-3 w-[310px] sm:w-[350px] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-[100] p-1"
               >
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="p-3.5 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest">Communications</h3>
-                    <p className="text-[10px] text-gray-400 font-medium">{unreadCount} unread alerts</p>
+                    <h3 className="text-xs font-bold text-[#002D62] uppercase tracking-wider">Communications</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">{unreadCount} unread alerts</p>
                   </div>
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllRead}
-                      className="text-[10px] font-bold text-[#0061E0] hover:underline cursor-pointer"
+                      className="text-[11px] font-semibold text-[#00A8A8] hover:text-[#002D62] transition-colors cursor-pointer"
                     >
                       Mark all read
                     </button>
                   )}
                 </div>
 
-                <div className="max-h-80 overflow-y-auto p-2 space-y-1.5 divide-y divide-gray-50">
+                <div className="max-h-80 overflow-y-auto p-1.5 space-y-1">
                   {notificationItems.map((item) => (
                     <div
                       key={item.id}
-                      className={`p-3 rounded-2xl transition-all flex items-start gap-3 hover:bg-slate-50 cursor-pointer ${
-                        item.unread ? 'bg-blue-50/40 border-l-3 border-[#0061E0]' : ''
+                      className={`p-2.5 rounded-xl transition-all flex items-start gap-3 hover:bg-slate-50 cursor-pointer ${
+                        item.unread ? 'bg-[#00A8A8]/5 border-l-2 border-[#00A8A8]' : ''
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-xl bg-blue-100 text-[#0061E0] flex items-center justify-center shrink-0 mt-0.5">
-                        <Bell className="w-4 h-4" />
+                      <div className="w-7 h-7 rounded-lg bg-[#002D62]/10 text-[#002D62] flex items-center justify-center shrink-0 mt-0.5">
+                        <Bell className="w-3.5 h-3.5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <p className="text-xs font-bold text-slate-900 truncate">{item.title}</p>
+                          <p className="text-xs font-bold text-[#002D62] truncate">{item.title}</p>
                           <span className="text-[9px] font-medium text-slate-400">{item.time}</span>
                         </div>
                         <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">{item.desc}</p>
@@ -293,8 +290,8 @@ export default function Navbar({ onMenuClick }) {
                   ))}
                 </div>
 
-                <div className="bg-gray-50/70 p-3 flex justify-center border-t border-gray-100">
-                  <span className="text-[10px] font-bold text-slate-500">
+                <div className="bg-slate-50 p-2.5 flex justify-center border-t border-slate-100 rounded-b-xl">
+                  <span className="text-[10px] font-semibold text-slate-500">
                     Live Demo Updates Active
                   </span>
                 </div>
@@ -305,27 +302,33 @@ export default function Navbar({ onMenuClick }) {
 
         {/* User Profile Section with ID & Status Badges */}
         <div className="relative" ref={profileMenuRef}>
-          <div
+          <button
+            type="button"
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-3 pl-3 lg:pl-5 border-l border-gray-100 cursor-pointer hover:opacity-90 transition-all"
+            className="flex items-center gap-3 pl-3 sm:pl-4 border-l border-slate-200/80 text-left cursor-pointer group hover:opacity-95 focus:outline-none"
           >
-            <div className="text-right hidden sm:block">
-              <h3 className="text-sm font-bold text-gray-900 leading-tight">{activePortal.user}</h3>
-              <p className="text-xs text-gray-400 font-semibold leading-tight mt-0.5">{activePortal.roleTitle}</p>
-              <div className="flex items-center justify-end gap-1.5 mt-1">
-                <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[9px] font-black uppercase tracking-wider">
-                  ID: {activePortal.id === 'employee' ? 'EMP001' : activePortal.id === 'manager' ? 'MGR007' : activePortal.id === 'hr' ? 'HR010' : 'ADM001'}
-                </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  FULL TIME
+            <div className="text-right hidden sm:flex flex-col justify-center">
+              <span className="text-sm font-semibold text-[#002D62] leading-tight group-hover:text-[#00A8A8] transition-colors">
+                {activePortal.user}
+              </span>
+              <div className="flex items-center justify-end gap-1.5 text-[11px] text-slate-500 leading-tight mt-0.5">
+                <span>{activePortal.roleTitle}</span>
+                <span className="text-slate-300">•</span>
+                <span className="font-semibold text-[#00A8A8] bg-[#00A8A8]/10 px-1.5 py-0.2 rounded text-[10px]">
+                  {activePortal.id === 'employee' ? 'EMP001' : activePortal.id === 'manager' ? 'MGR007' : activePortal.id === 'hr' ? 'HR010' : 'ADM001'}
                 </span>
               </div>
             </div>
 
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0061E0] to-blue-400 text-white font-extrabold text-sm flex items-center justify-center shadow-lg shadow-[#0061E0]/20 shrink-0">
-              {activePortal.user.charAt(0)}
+            <div className="relative shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#002D62] to-[#00A8A8] text-white font-bold text-sm flex items-center justify-center shadow-xs ring-2 ring-white">
+                {activePortal.user.charAt(0)}
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white" />
             </div>
-          </div>
+
+            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 hidden sm:block" />
+          </button>
 
           <AnimatePresence>
             {showProfileMenu && (
@@ -334,14 +337,18 @@ export default function Navbar({ onMenuClick }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.96 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-3 w-64 bg-white rounded-3xl shadow-2xl border border-slate-100 p-2 z-50"
+                className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 font-sans"
               >
-                <div className="p-3.5 border-b border-slate-100">
-                  <div className="font-bold text-sm text-slate-900">{activePortal.user}</div>
-                  <div className="text-xs text-slate-400 font-medium">{activePortal.roleTitle}</div>
-                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Simulated Active Session
+                <div className="p-3 border-b border-slate-100">
+                  <div className="font-bold text-sm text-[#002D62]">{activePortal.user}</div>
+                  <div className="text-xs text-slate-500 font-medium">{activePortal.roleTitle}</div>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-bold uppercase tracking-wider">
+                      ID: {activePortal.id === 'employee' ? 'EMP001' : activePortal.id === 'manager' ? 'MGR007' : activePortal.id === 'hr' ? 'HR010' : 'ADM001'}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      FULL TIME
+                    </span>
                   </div>
                 </div>
 
@@ -380,15 +387,15 @@ export default function Navbar({ onMenuClick }) {
         </div>
       </div>
 
-      {/* Quick Search Modal */}
+      {/* Quick Search Modal (Portaled to document.body) */}
       <AnimatePresence>
-        {showSearchModal && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4">
+        {showSearchModal && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 p-4 font-sans">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs"
+              className="fixed inset-0 bg-slate-950/60 backdrop-blur-md cursor-pointer"
               onClick={() => setShowSearchModal(false)}
             />
             <motion.div
@@ -398,18 +405,18 @@ export default function Navbar({ onMenuClick }) {
               className="relative bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden z-10"
             >
               <div className="p-4 border-b border-slate-100 flex items-center gap-3">
-                <Search className="w-5 h-5 text-blue-600 shrink-0" />
+                <Search className="w-5 h-5 text-[#00A8A8] shrink-0" />
                 <input
                   type="text"
-                  placeholder="Search pages, employees, companies..."
+                  placeholder="Search pages, employees, modules..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="w-full text-sm font-medium outline-hidden text-slate-900 placeholder:text-slate-400"
+                  className="w-full text-sm font-medium outline-none text-slate-900 placeholder:text-slate-400"
                 />
                 <button
                   onClick={() => setShowSearchModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -417,10 +424,11 @@ export default function Navbar({ onMenuClick }) {
 
               <div className="p-4 max-h-80 overflow-y-auto space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">Quick Navigation</div>
-                <p className="text-xs text-slate-400 px-2 py-2">Use the sidebar to navigate between modules.</p>
+                <p className="text-xs text-slate-400 px-2 py-2">Use the navigation bar and sidebars to navigate between modules.</p>
               </div>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
     </header>
